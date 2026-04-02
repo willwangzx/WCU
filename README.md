@@ -6,3 +6,5 @@ At William Chi-Chi University, learning extends far beyond the classroom. Throug
 Guided by the motto, “ultra examina,” the university does not reject evaluation, but rather redefines its purpose. Grades are not the ultimate measure of success—what truly matters is critical thinking, creativity, and the ability to make an impact.
 
 William Chi-Chi University strives to create an open, dynamic, and intellectually challenging environment where students are empowered not just to fit into the world, but to shape it.
+
+校长神人来的
