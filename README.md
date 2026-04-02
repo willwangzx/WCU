@@ -7,7 +7,4 @@ Guided by the motto, “ultra examina,” the university does not reject evaluat
 
 William Chi-Chi University strives to create an open, dynamic, and intellectually challenging environment where students are empowered not just to fit into the world, but to shape it.
 
-Our faculties are highly qualified, open-minded...
 
-
-shabishurufa
