@@ -193,7 +193,7 @@ main,
 .hero h1,
 h1,
 h2 {
-  font-family: "Playfair Display", Georgia, serif;
+  font-family: "Inter", sans-serif;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
