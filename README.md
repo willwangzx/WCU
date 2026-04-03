@@ -118,12 +118,10 @@ William Chi-Chi University Website
         Submission is simulated in the browser only
 ```
 
-## Quick Reading Order
+## Quick Reading instructions
 
 1. `index.html` to understand the homepage tone and structure.
 2. `academics.html` to understand the biggest content hub.
 3. The six `school-*.html` pages to see the repeated school-page pattern.
 4. `styles.css` to understand the shared design system and layout rules.
 5. `script.js` and the inline script in `academics.html` for interaction behavior.
-
-
