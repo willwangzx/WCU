@@ -485,6 +485,12 @@ section[id] {
   gap: 20px;
 }
 
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
 .list-panel,
 .timeline {
   border: 1px solid var(--line);
@@ -646,4 +652,13 @@ section[id] {
 .academic-nav a.active {
   background: var(--accent);
   color: white;
+}
+
+.school-hero {
+  min-height: 38vh;
+  background: linear-gradient(135deg, #102746, #325b89);
+}
+
+.school-page-main .section:last-child {
+  border-bottom: none;
 }
