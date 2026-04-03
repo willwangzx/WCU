@@ -744,6 +744,11 @@ section[id] {
   color: var(--text);
 }
 
+.required-mark {
+  color: #d22f27;
+  font-weight: 700;
+}
+
 .form-field input,
 .form-field select,
 .form-field textarea {
@@ -770,10 +775,39 @@ section[id] {
   resize: vertical;
 }
 
+.form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbfcfe;
+}
+
+.form-checkbox input {
+  width: auto;
+  margin-top: 3px;
+}
+
+.form-checkbox label {
+  font-weight: 400;
+  color: var(--muted);
+}
+
 .form-note {
   margin: 0;
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+.application-status {
+  display: grid;
+  gap: 6px;
+}
+
+.form-note-success {
+  color: #146c43;
 }
 
 .application-actions {

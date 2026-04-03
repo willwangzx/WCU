@@ -39,14 +39,14 @@
         <p class="eyebrow">Before You Start</p>
         <h3>Prepare these materials</h3>
         <ul>
-          <li>We do NOT need academic transcript！ Standardized test scores are optional.</li>
+          <li>We do NOT need academic transcript; standardized test scores are optional!</li>
           <li>Personal statement describing your goals and interests.</li>
           <li>One project, portfolio, or writing sample.</li>
           <li>Passport or legal name details for enrollment records.</li>
         </ul>
       </aside>
 
-      <form class="application-form">
+      <form class="application-form" id="applicationForm">
         <div class="section-header">
           <p class="eyebrow">Applicant Information</p>
           <h2>Start your application.</h2>
@@ -54,35 +54,35 @@
 
         <div class="application-form-grid">
           <div class="form-field">
-            <label for="first-name">First Name</label>
-            <input id="first-name" name="first-name" type="text" placeholder="Given name" />
+            <label for="first-name">First Name <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="first-name" name="first-name" type="text" placeholder="Given name" required />
           </div>
           <div class="form-field">
-            <label for="last-name">Last Name</label>
-            <input id="last-name" name="last-name" type="text" placeholder="Family name" />
+            <label for="last-name">Last Name <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="last-name" name="last-name" type="text" placeholder="Family name" required />
           </div>
           <div class="form-field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="name@example.com" />
+            <label for="email">Email <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="email" name="email" type="email" placeholder="name@example.com" required />
           </div>
           <div class="form-field">
-            <label for="phone">Phone</label>
-            <input id="phone" name="phone" type="tel" placeholder="+86 191 9810 7813" />
+            <label for="phone">Phone <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="phone" name="phone" type="tel" placeholder="+86 191 9810 7813" required />
           </div>
           <div class="form-field">
-            <label for="citizenship">Citizenship</label>
-            <input id="citizenship" name="citizenship" type="text" placeholder="Country or region" />
+            <label for="citizenship">Citizenship <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="citizenship" name="citizenship" type="text" placeholder="Country or region" required />
           </div>
           <div class="form-field">
-            <label for="entry-term">Entry Term</label>
-            <select id="entry-term" name="entry-term">
+            <label for="entry-term">Entry Term <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="entry-term" name="entry-term" required>
               <option>Fall 2026</option>
               <option>Spring 2027</option>
             </select>
           </div>
           <div class="form-field">
-            <label for="program">Intended Program</label>
-            <select id="program" name="program">
+            <label for="program">Intended Program <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="program" name="program" required>
               <option>Computer Science and Mathematics</option>
               <option>Engineering and Natural Science</option>
               <option>Business and Management</option>
@@ -92,25 +92,35 @@
             </select>
           </div>
           <div class="form-field">
-            <label for="school-name">Current or Most Recent School</label>
-            <input id="school-name" name="school-name" type="text" placeholder="School name" />
+            <label for="school-name">Current or Most Recent School <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="school-name" name="school-name" type="text" placeholder="School name" required />
           </div>
           <div class="form-field form-field-full">
-            <label for="statement">Personal Statement</label>
-            <textarea id="statement" name="statement" placeholder="Tell us what you hope to study, build, or understand at WCU."></textarea>
+            <label for="statement">Personal Statement <span class="required-mark" aria-hidden="true">*</span></label>
+            <textarea id="statement" name="statement" placeholder="Tell us what you hope to study, build, or understand at WCU." required></textarea>
           </div>
           <div class="form-field form-field-full">
-            <label for="portfolio">Portfolio or Sample Link</label>
-            <input id="portfolio" name="portfolio" type="url" placeholder="https://your-portfolio.example" />
+            <label for="portfolio">Portfolio or Sample Link <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="portfolio" name="portfolio" type="url" placeholder="https://your-portfolio.example" required />
           </div>
           <div class="form-field form-field-full">
             <label for="notes">Additional Context</label>
             <textarea id="notes" name="notes" placeholder="Optional context about achievements, circumstances, or interests."></textarea>
           </div>
+          <div class="form-field form-field-full">
+            <label for="application-confirmation">Required Confirmation <span class="required-mark" aria-hidden="true">*</span></label>
+            <div class="form-checkbox">
+              <input id="application-confirmation" name="application-confirmation" type="checkbox" required />
+              <label for="application-confirmation">I have read and understood the University's application policies, and I certify that all information provided above is true and accurate.</label>
+            </div>
+          </div>
         </div>
 
         <div class="application-actions">
-          <p class="form-note">Demo application form: submission handling is not yet connected to a backend.</p>
+          <div class="application-status">
+            <p class="form-note">Fields marked as required must be completed before submission. Additional Context is optional.</p>
+            <p class="form-note" id="applicationMessage" aria-live="polite"></p>
+          </div>
           <button class="btn btn-solid" type="submit">Submit Application</button>
         </div>
       </form>
