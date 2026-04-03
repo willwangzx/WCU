@@ -6,14 +6,20 @@
   <title>Academics | William Chichi University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 
 </head>
 <body>
+  <div class="loading-screen" id="loadingScreen" aria-hidden="true">
+    <svg class="loading-mark" viewBox="0 0 120 120" role="img" aria-label="WCU loading mark">
+      <path d="M18 20 L36 98 L60 42 L84 98 L102 20" />
+    </svg>
+  </div>
+
   <header class="site-header">
     <a class="brand" href="index.html"><span class="brand-mark">W</span><span class="brand-text">William Chichi University</span></a>
-    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navMenu">☰ Menu</button>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navMenu">Menu</button>
     <nav id="navMenu" class="site-nav" aria-label="Primary">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
@@ -57,7 +63,7 @@
         </div>
         <div class="card">
           <h3> Degrees & Calendar</h3>
-          <p><strong>Bachelor, Master, Doctorate, Certificate Programs</strong><br>Fall 2026: Aug 25 – Dec 12 | Spring 2027: Jan 18 – May 5 | Summer intensive sessions. Add/Drop deadline: Sep 5 (Fall). <a href="#" style="color: var(--wcu-gold);">Full academic calendar →</a></p>
+          <p><strong>Bachelor, Master, Doctorate, Certificate Programs</strong><br>Fall 2026: Aug 25 – Dec 12 | Spring 2027: Jan 18 – May 5 | Summer intensive sessions. Add/Drop deadline: Sep 5 (Fall). <a class="inline-accent-link" href="#">Full academic calendar →</a></p>
         </div>
         <div class="card">
           <h3> Outcomes & Distinctions</h3>
@@ -178,7 +184,7 @@
           </a>
         </div>
       </div>
-      <p style="margin-top: 1rem; font-style: italic;">Each school includes: department overview, degree list, labs, faculty profiles, and internship tracks. <a href="#">Explore all departments →</a></p>
+      <p class="academics-note">Each school includes: department overview, degree list, labs, faculty profiles, and internship tracks. <a href="#">Explore all departments →</a></p>
     </section>
 
     <!-- ================= Academic Resources ================= -->
@@ -257,7 +263,7 @@
           <p>Intensive 5-week courses, international summer institute, research experience for undergrads (REU). High school scholars program available.</p>
         </div>
       </div>
-      <div style="margin-top: 1.5rem; background: #E8F0F5; border-radius: 24px; padding: 1.5rem;">
+      <div class="academics-highlight">
         <p><strong> Future-focused expansion:</strong> micro-credentials in AI fluency, climate leadership, and digital humanities — stackable with major degrees. <a href="#">Explore all signature tracks →</a></p>
       </div>
     </section>
@@ -315,3 +321,4 @@
 
 </body>
 </html>
+
