@@ -479,6 +479,282 @@ section[id] {
   max-width: 680px;
 }
 
+.admissions-hero {
+  min-height: 62vh;
+  background:
+    radial-gradient(circle at top right, rgba(110, 190, 255, 0.28), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(255, 189, 89, 0.18), transparent 28%),
+    linear-gradient(140deg, #0b1f3a, #123560 45%, #1e4f73);
+}
+
+.admissions-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap: 24px;
+  align-items: end;
+}
+
+.admissions-hero-copy {
+  max-width: 760px;
+}
+
+.admissions-hero-card {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(2, 12, 28, 0.25);
+}
+
+.hero-card-label {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.admissions-deadline {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.7rem;
+  line-height: 1.2;
+  margin-bottom: 18px;
+}
+
+.admissions-hero-points {
+  margin: 0;
+  padding-left: 18px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.admissions-hero-points li {
+  margin-bottom: 10px;
+}
+
+.admissions-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admissions-overview {
+  display: grid;
+  gap: 22px;
+}
+
+.admissions-strip article {
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(180deg, rgba(31, 93, 255, 0.04), transparent),
+    var(--surface);
+}
+
+.admissions-strip-number {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.admissions-strip-label {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.admissions-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admissions-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admissions-steps {
+  background:
+    linear-gradient(180deg, rgba(31, 93, 255, 0.06), transparent),
+    var(--surface);
+}
+
+.admissions-checklist {
+  background: var(--bg);
+}
+
+.admissions-principle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+  gap: 28px;
+  padding: 28px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(circle at top left, rgba(31, 93, 255, 0.08), transparent 38%),
+    linear-gradient(180deg, #ffffff, #f4f7fb);
+}
+
+.admissions-principle h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+}
+
+.admissions-principle p:last-child {
+  margin: 0;
+  align-self: center;
+  font-size: 1.02rem;
+}
+
+.admissions-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto;
+  gap: 24px;
+  align-items: center;
+  padding: 30px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #0d2647, #1e4f73);
+  color: #fff;
+  box-shadow: 0 28px 70px rgba(8, 24, 46, 0.16);
+}
+
+.admissions-cta h2 {
+  margin: 8px 0 12px;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+}
+
+.admissions-cta p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+  max-width: 640px;
+}
+
+.admissions-cta .eyebrow {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.admissions-cta .btn-outline {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.admissions-cta-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admissions-cta-actions .btn {
+  min-width: 168px;
+  text-align: center;
+}
+
+.application-main {
+  max-width: 980px;
+}
+
+.application-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.35fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.application-panel,
+.application-form {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  padding: 28px;
+}
+
+.application-panel {
+  position: sticky;
+  top: 106px;
+  background:
+    linear-gradient(180deg, rgba(31, 93, 255, 0.06), transparent),
+    var(--surface);
+}
+
+.application-panel h3,
+.application-form h3 {
+  margin-top: 0;
+}
+
+.application-panel ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.application-panel li {
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.application-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-field {
+  display: grid;
+  gap: 8px;
+}
+
+.form-field-full {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--text);
+  background: #fbfcfe;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(31, 93, 255, 0.12);
+}
+
+.form-field textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.form-note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.application-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 24px;
+}
+
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -560,8 +836,26 @@ section[id] {
 
   .pillars,
   .campus-band,
-  .two-col {
+  .two-col,
+  .application-layout,
+  .admissions-info-grid,
+  .admissions-strip,
+  .admissions-hero-grid,
+  .admissions-principle,
+  .admissions-cta {
     grid-template-columns: 1fr;
+  }
+
+  .admissions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admissions-cta-actions {
+    justify-content: flex-start;
+  }
+
+  .application-panel {
+    position: static;
   }
 }
 
@@ -646,4 +940,33 @@ section[id] {
 .academic-nav a.active {
   background: var(--accent);
   color: white;
+}
+
+@media (max-width: 640px) {
+  .admissions-grid,
+  .admissions-cta-actions,
+  .application-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admissions-cta,
+  .admissions-principle,
+  .admissions-hero-card,
+  .application-panel,
+  .application-form {
+    padding: 22px;
+  }
+
+  .admissions-cta-actions {
+    display: grid;
+  }
+
+  .admissions-cta-actions .btn {
+    text-align: center;
+  }
+
+  .application-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
