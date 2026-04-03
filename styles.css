@@ -113,14 +113,17 @@ a {
   display: flex;
   justify-content: center;
   gap: 18px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .site-nav a {
   color: var(--muted);
   font-size: 0.92rem;
-  padding-bottom: 3px;
+  padding: 0.35rem 0.5rem 0.2rem;
   border-bottom: 1px solid transparent;
   transition: color 0.22s ease, border-color 0.22s ease;
+  white-space: nowrap;
 }
 
 .site-nav a:hover,
@@ -886,6 +889,22 @@ section[id] {
   .academic-nav a {
     font-size: 0.82rem;
     padding: 0.45rem 0.9rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .site-nav {
+    gap: 12px;
+    justify-content: flex-start;
+  }
+
+  .site-nav a {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.45rem 0.2rem;
+  }
+
+  .site-header {
+    grid-template-columns: auto 1fr auto auto;
   }
 }
 
