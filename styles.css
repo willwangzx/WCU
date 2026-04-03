@@ -2,7 +2,7 @@
   --bg: #f7f8fb;
   --surface: #ffffff;
   --text: #0b1f3a;
-  --muted: #5e6b7f;
+  --muted: #44556d;
   --line: #d6dde8;
   --accent: #1f5dff;
   --wcu-gold: #b88a2d;
@@ -186,6 +186,11 @@ main {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.hero h1,
+.hero .hero-subtitle {
+  color: #fff;
+}
+
 .hero-mark {
   font-size: clamp(4rem, 11vw, 7.6rem);
   font-family: "Playfair Display", Georgia, serif;
@@ -194,7 +199,6 @@ main {
   opacity: 0.92;
 }
 
-.hero h1,
 h1,
 h2 {
   font-family: "Inter", Georgia, sans-serif;
@@ -506,11 +510,20 @@ section[id] {
 .page-hero h1 {
   margin: 10px 0 0;
   font-size: clamp(2rem, 5.1vw, 3.6rem);
+  color: #fff;
 }
 
 .page-intro {
   margin-top: 16px;
   max-width: 680px;
+}
+
+.page-hero .eyebrow {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.page-hero .page-intro {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .admissions-hero {
@@ -661,6 +674,10 @@ section[id] {
   color: white;
 }
 
+.inline-accent-link {
+  color: var(--wcu-gold);
+}
+
 .admissions-principle {
   border-radius: 24px;
   border: 1px solid var(--line);
@@ -695,6 +712,7 @@ section[id] {
 .admissions-cta h2 {
   margin: 8px 0 12px;
   font-size: clamp(1.9rem, 4vw, 3rem);
+  color: #fff;
 }
 
 .admissions-cta p {
@@ -788,6 +806,11 @@ section[id] {
   color: var(--text);
 }
 
+.required-mark {
+  color: #d22f27;
+  font-weight: 700;
+}
+
 .form-field input,
 .form-field select,
 .form-field textarea {
@@ -814,10 +837,39 @@ section[id] {
   resize: vertical;
 }
 
+.form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fbfcfe;
+}
+
+.form-checkbox input {
+  width: auto;
+  margin-top: 3px;
+}
+
+.form-checkbox label {
+  font-weight: 400;
+  color: var(--muted);
+}
+
 .form-note {
   margin: 0;
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+.application-status {
+  display: grid;
+  gap: 6px;
+}
+
+.form-note-success {
+  color: #146c43;
 }
 
 .application-actions {
@@ -993,6 +1045,18 @@ section[id] {
   margin-top: 0.75rem;
   background: rgba(31, 93, 255, 0.1);
   color: var(--accent);
+}
+
+.academics-note {
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+.academics-highlight {
+  margin-top: 1.5rem;
+  background: #e8f0f5;
+  border-radius: 24px;
+  padding: 1.5rem;
 }
 
 .footer-links {
