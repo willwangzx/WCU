@@ -18,18 +18,22 @@ if (menuToggle && navMenu) {
   });
 }
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  },
-  {
-    threshold: 0.12,
-  }
-);
+if ("IntersectionObserver" in window) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.12,
+    }
+  );
 
-document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
+  document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
+} else {
+  document.querySelectorAll(".reveal").forEach((node) => node.classList.add("visible"));
+}
