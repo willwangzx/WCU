@@ -18,7 +18,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  background: var(--surface);
   color: var(--text);
   font-family: "Inter", "Segoe UI", sans-serif;
   scroll-behavior: smooth;
@@ -192,11 +192,38 @@ main,
 
 .hero h1,
 h1,
-h2,
-h3 {
+h2 {
   font-family: "Playfair Display", Georgia, serif;
   font-weight: 600;
   letter-spacing: 0.01em;
+}
+
+h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+h4 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  border-left: 6px solid var(--accent);
+  padding-left: 1rem;
+  font-weight: 700;
+}
+
+section[id] {
+  scroll-margin-top: 150px;
 }
 
 .hero h1 {
@@ -302,7 +329,7 @@ h3 {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 24px;
-  background: var(--surface);
+  background: var(--bg);
   position: relative;
   overflow: hidden;
   transition: transform 0.24s ease, border-color 0.24s ease;
@@ -538,33 +565,85 @@ h3 {
   }
 }
 
-@media (max-width: 700px) {
-  .site-header,
-  main,
-  .site-footer,
-  .page-hero {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
+.schools-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.8rem;
+  margin-top: 1rem;
+}
 
-  .brand-text {
-    display: none;
-  }
+.school-card,
+.resource-card {
+  border-radius: 24px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: all 0.25s ease;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
 
-  .card-grid {
-    grid-template-columns: 1fr;
-  }
+.school-card:hover,
+.resource-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+}
 
-  .hero {
-    min-height: 76vh;
-  }
+.badge {
+  border-radius: 60px;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 0.75rem;
+  background: rgba(31, 93, 255, 0.1);
+  color: var(--accent);
+}
 
-  .site-footer {
-    grid-template-columns: 1fr;
-  }
+.footer-links {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
 
-  .news-list span {
-    display: block;
-    margin-bottom: 4px;
-  }
+.site-footer {
+  color: #D1D9E6;
+  padding: 3rem 2rem;
+  margin-top: 3rem;
+  background: #0b1f3a;
+}
+
+.academic-nav {
+  position: sticky;
+  top: 78px;
+  z-index: 99;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 1rem 0;
+}
+
+.academic-nav .inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.academic-nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: background 0.2s;
+}
+
+.academic-nav a:hover,
+.academic-nav a.active {
+  background: var(--accent);
+  color: white;
 }
