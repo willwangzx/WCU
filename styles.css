@@ -981,50 +981,41 @@ section[id] {
   }
 }
 
-.schools-showcase {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.8rem;
-  margin-top: 1rem;
-}
-
-.school-card,
-.resource-card {
+.school-card {
   border-radius: 24px;
   padding: 1.8rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   transition: all 0.25s ease;
   border: 1px solid var(--line);
   background: var(--surface);
+  
+  /* 关键：使用 Flexbox 布局 */
+  display: flex;
+  flex-direction: column;
+  height: 50%;  /* 确保卡片填满网格高度 */
 }
 
-.school-card:hover,
-.resource-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+/* 标题区域：固定最小高度，确保占位一致 */
+.school-card h3 {
+  min-height: 4.5rem;  /* 约容纳2行标题的高度（可根据实际调整） */
+  margin-bottom: 0.75rem;
+  font-size: 1.3rem;
+  line-height: 1.3;
 }
 
-.schools-showcase {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.8rem;
-  margin-top: 1rem;
+/* 描述文字：自然占据剩余空间，但起始位置会因标题高度而统一 */
+.school-card p {
+  flex: 1;  /* 让描述文字占据剩余空间，但更关键的是下面的 margin-top: auto */
+  margin-bottom: 1rem;
 }
 
-.school-card,
-.resource-card {
-  border-radius: 24px;
-  padding: 1.8rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  transition: all 0.25s ease;
-  border: 1px solid var(--line);
-  background: var(--surface);
-}
-
-.school-card:hover,
-.resource-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+/* Learn more 链接：始终贴在底部 */
+.school-card .learn-more {
+  margin-top: auto;  /* 关键：推到底部 */
+  display: inline-block;
+  color: var(--wcu-gold);
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .badge {
