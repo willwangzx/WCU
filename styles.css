@@ -78,9 +78,13 @@ a {
   backdrop-filter: blur(10px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--line);
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 16px 24px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: max(24px, calc((100vw - var(--max)) / 2 + 24px));
+  padding-right: max(24px, calc((100vw - var(--max)) / 2 + 24px));
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   gap: 18px;
@@ -133,8 +137,7 @@ a {
   display: none;
 }
 
-main,
-.site-footer {
+main {
   max-width: var(--max);
   margin: 0 auto;
   padding: 0 24px;
@@ -488,12 +491,14 @@ section[id] {
   border-radius: 0 0 var(--radius) var(--radius);
   display: grid;
   align-items: end;
-  padding: 0 24px;
+  width: 100%;
+  padding-left: max(24px, calc((100vw - var(--max)) / 2 + 24px));
+  padding-right: max(24px, calc((100vw - var(--max)) / 2 + 24px));
 }
 
 .page-hero .inner {
-  max-width: var(--max);
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   width: 100%;
   padding: 70px 0 56px;
 }
@@ -999,8 +1004,13 @@ section[id] {
 
 .site-footer {
   color: #D1D9E6;
-  padding: 3rem 2rem;
+  width: 100%;
+  max-width: none;
   margin-top: 3rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  padding-left: max(2rem, calc((100vw - var(--max)) / 2 + 2rem));
+  padding-right: max(2rem, calc((100vw - var(--max)) / 2 + 2rem));
   background: #0b1f3a;
 }
 
