@@ -78,13 +78,23 @@ a {
   backdrop-filter: blur(10px);
   background: var(--header-bg);
   border-bottom: 1px solid var(--line);
-  max-width: var(--max);
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   padding: 16px 24px;
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   gap: 18px;
   align-items: center;
+}
+
+.site-nav {
+  display: flex;
+  flex: 1 1 100%;
+  width: 100%;
+  justify-content: space-evenly;
+  gap: 14px;
+  min-width: 0;
 }
 
 .brand {
