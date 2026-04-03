@@ -878,6 +878,15 @@ section[id] {
   .site-nav a {
     font-size: 0.85rem;
   }
+
+  .academic-nav .inner {
+    gap: 0.75rem;
+  }
+
+  .academic-nav a {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.9rem;
+  }
 }
 
 @media (max-width: 980px) {
@@ -916,6 +925,16 @@ section[id] {
 
   .site-header .btn-outline {
     display: none;
+  }
+
+  .academic-nav .inner {
+    gap: 0.5rem;
+    padding: 0 16px;
+  }
+
+  .academic-nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
   }
 
   .pillars,
