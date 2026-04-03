@@ -27,15 +27,15 @@
 
   <section class="page-hero">
     <div class="inner reveal">
-      <p class="eyebrow">Application Form</p>
-      <h1>Undergraduate application for WCU.</h1>
-      <p class="page-intro">Complete the form below to begin your application. This page is designed as the primary intake form for academic background, program interest, and supporting information.</p>
+      <p class="eyebrow">Apply Now</p>
+      <h1>Begin your undergraduate application to WCU.</h1>
+      <p class="page-intro">Review the application requirements, then continue to the dedicated form page to submit your information and supporting materials.</p>
     </div>
   </section>
 
   <main class="application-main">
-    <section class="section reveal application-layout">
-      <aside class="application-panel">
+    <section class="section reveal">
+      <div class="application-top-panel">
         <p class="eyebrow">Before You Start</p>
         <h3>Prepare these materials</h3>
         <ul>
@@ -44,86 +44,51 @@
           <li>One project, portfolio, or writing sample.</li>
           <li>Passport or legal name details for enrollment records.</li>
         </ul>
-      </aside>
+      </div>
+    </section>
 
-      <form class="application-form" id="applicationForm">
+    <section class="section reveal">
+      <div class="application-sample">
         <div class="section-header">
-          <p class="eyebrow">Applicant Information</p>
-          <h2>Start your application.</h2>
+          <p class="eyebrow">Sample Application</p>
+          <h2>Example of a strong submission profile.</h2>
         </div>
+        <div class="application-sample-grid">
+          <article class="application-sample-card">
+            <h3>Applicant Snapshot</h3>
+            <p><strong>Name:</strong> Maya Chen</p>
+            <p><strong>Intended Program:</strong> Computer Science and Mathematics</p>
+            <p><strong>Current School:</strong> Hangzhou International Academy</p>
+            <p><strong>Portfolio:</strong> GitHub project archive, data visualization portfolio, and a machine learning research abstract.</p>
+          </article>
+          <article class="application-sample-card">
+            <h3>Statement Direction</h3>
+            <p>Maya explains how she became interested in trustworthy AI through a local public-health data project, then connects that experience to her goal of studying computational modeling and socially responsible systems design at WCU.</p>
+          </article>
+          <article class="application-sample-card">
+            <h3>Additional Context</h3>
+            <p>This optional field can be used to explain unusual grading periods, independent projects, internships, competitions, or personal circumstances that shaped the application.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-        <div class="application-form-grid">
-          <div class="form-field">
-            <label for="first-name">First Name <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="first-name" name="first-name" type="text" placeholder="Given name" required />
-          </div>
-          <div class="form-field">
-            <label for="last-name">Last Name <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="last-name" name="last-name" type="text" placeholder="Family name" required />
-          </div>
-          <div class="form-field">
-            <label for="email">Email <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="email" name="email" type="email" placeholder="name@example.com" required />
-          </div>
-          <div class="form-field">
-            <label for="phone">Phone <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="phone" name="phone" type="tel" placeholder="+86 191 9810 7813" required />
-          </div>
-          <div class="form-field">
-            <label for="citizenship">Citizenship <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="citizenship" name="citizenship" type="text" placeholder="Country or region" required />
-          </div>
-          <div class="form-field">
-            <label for="entry-term">Entry Term <span class="required-mark" aria-hidden="true">*</span></label>
-            <select id="entry-term" name="entry-term" required>
-              <option>Fall 2026</option>
-              <option>Spring 2027</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label for="program">Intended Program <span class="required-mark" aria-hidden="true">*</span></label>
-            <select id="program" name="program" required>
-              <option>Computer Science and Mathematics</option>
-              <option>Engineering and Natural Science</option>
-              <option>Business and Management</option>
-              <option>Art and Literature</option>
-              <option>Humanities and Social Science</option>
-              <option>Interdisciplinary Studies</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label for="school-name">Current or Most Recent School <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="school-name" name="school-name" type="text" placeholder="School name" required />
-          </div>
-          <div class="form-field form-field-full">
-            <label for="statement">Personal Statement <span class="required-mark" aria-hidden="true">*</span></label>
-            <textarea id="statement" name="statement" placeholder="Tell us what you hope to study, build, or understand at WCU." required></textarea>
-          </div>
-          <div class="form-field form-field-full">
-            <label for="portfolio">Portfolio or Sample Link <span class="required-mark" aria-hidden="true">*</span></label>
-            <input id="portfolio" name="portfolio" type="url" placeholder="https://your-portfolio.example" required />
-          </div>
-          <div class="form-field form-field-full">
-            <label for="notes">Additional Context</label>
-            <textarea id="notes" name="notes" placeholder="Optional context about achievements, circumstances, or interests."></textarea>
-          </div>
-          <div class="form-field form-field-full">
-            <label for="application-confirmation">Required Confirmation <span class="required-mark" aria-hidden="true">*</span></label>
-            <div class="form-checkbox">
-              <input id="application-confirmation" name="application-confirmation" type="checkbox" required />
-              <label for="application-confirmation">I have read and understood the University's application policies, and I certify that all information provided above is true and accurate.</label>
-            </div>
-          </div>
+    <section class="section reveal">
+      <div class="apply-landing">
+        <div class="apply-landing-copy">
+          <p class="eyebrow">Application Access</p>
+          <h2>Continue to the application form.</h2>
+          <p>You will be asked to provide personal details, your intended program, a personal statement, and a portfolio or sample link. Additional Context remains optional.</p>
+          <ul class="apply-landing-list">
+            <li>Academic transcripts are not required.</li>
+            <li>Standardized test scores are optional.</li>
+            <li>All required fields must be completed before submission.</li>
+          </ul>
         </div>
-
-        <div class="application-actions">
-          <div class="application-status">
-            <p class="form-note">Fields marked as required must be completed before submission. Additional Context is optional.</p>
-            <p class="form-note" id="applicationMessage" aria-live="polite"></p>
-          </div>
-          <button class="btn btn-solid" type="submit">Submit Application</button>
+        <div class="apply-landing-actions">
+          <a class="btn btn-solid" href="apply-form.html">Go to Application Form</a>
         </div>
-      </form>
+      </div>
     </section>
   </main>
 

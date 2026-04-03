@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Application Form | William Chichi University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="loading-screen" id="loadingScreen" aria-hidden="true">
+    <svg class="loading-mark" viewBox="0 0 120 120" role="img" aria-label="WCU loading mark">
+      <path d="M18 20 L36 98 L60 42 L84 98 L102 20" />
+    </svg>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark">W</span><span class="brand-text">William Chichi University</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navMenu">Menu</button>
+    <nav id="navMenu" class="site-nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="academics.html">Academics</a>
+      <a href="campus.html">Campus</a>
+      <a class="active" href="admissions.html">Admissions</a>
+      <a href="research.html">Research</a>
+      <a href="news.html">News</a>
+    </nav>
+    <a class="btn btn-outline" href="apply.html">Apply Now</a>
+  </header>
+
+  <section class="page-hero">
+    <div class="inner reveal">
+      <p class="eyebrow">Application Form</p>
+      <h1>Complete your WCU application.</h1>
+      <p class="page-intro">Fill in the required sections below to submit your undergraduate application for review.</p>
+    </div>
+  </section>
+
+  <main class="application-main">
+    <section class="section reveal">
+      <form class="application-form" id="applicationForm" action="application-success.html" method="get">
+        <div class="section-header">
+          <p class="eyebrow">Applicant Information</p>
+          <h2>Start your application.</h2>
+        </div>
+
+        <div class="application-form-grid">
+          <div class="form-field">
+            <label for="first-name">First Name <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="first-name" name="first-name" type="text" placeholder="Given name" required />
+          </div>
+          <div class="form-field">
+            <label for="last-name">Last Name <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="last-name" name="last-name" type="text" placeholder="Family name" required />
+          </div>
+          <div class="form-field">
+            <label for="email">Email <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="email" name="email" type="email" placeholder="name@example.com" required />
+          </div>
+          <div class="form-field">
+            <label for="phone">Phone <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="phone" name="phone" type="tel" placeholder="+86 191 9810 7813" required />
+          </div>
+          <div class="form-field">
+            <label for="citizenship">Citizenship <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="citizenship" name="citizenship" type="text" placeholder="Country or region" required />
+          </div>
+          <div class="form-field">
+            <label for="entry-term">Entry Term <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="entry-term" name="entry-term" required>
+              <option>Fall 2026</option>
+              <option>Spring 2027</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="program">Intended Program <span class="required-mark" aria-hidden="true">*</span></label>
+            <select id="program" name="program" required>
+              <option>Computer Science and Mathematics</option>
+              <option>Engineering and Natural Science</option>
+              <option>Business and Management</option>
+              <option>Art and Literature</option>
+              <option>Humanities and Social Science</option>
+              <option>Interdisciplinary Studies</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="school-name">Current or Most Recent School <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="school-name" name="school-name" type="text" placeholder="School name" required />
+          </div>
+          <div class="form-field form-field-full">
+            <label for="statement">Personal Statement <span class="required-mark" aria-hidden="true">*</span></label>
+            <textarea id="statement" name="statement" placeholder="Tell us what you hope to study, build, or understand at WCU." required></textarea>
+          </div>
+          <div class="form-field form-field-full">
+            <label for="portfolio">Portfolio or Sample Link <span class="required-mark" aria-hidden="true">*</span></label>
+            <input id="portfolio" name="portfolio" type="url" placeholder="https://your-portfolio.example" required />
+          </div>
+          <div class="form-field form-field-full">
+            <label for="notes">Additional Context</label>
+            <textarea id="notes" name="notes" placeholder="Optional context about achievements, circumstances, or interests."></textarea>
+          </div>
+          <div class="form-field form-field-full">
+            <label for="application-confirmation">Required Confirmation <span class="required-mark" aria-hidden="true">*</span></label>
+            <div class="form-checkbox">
+              <input id="application-confirmation" name="application-confirmation" type="checkbox" required />
+              <label for="application-confirmation">I have read and understood the University's application policies, and I certify that all information provided above is true and accurate.</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="application-actions">
+          <div class="application-status">
+            <p class="form-note">Fields marked as required must be completed before submission. Additional Context is optional.</p>
+          </div>
+          <button class="btn btn-solid" type="submit">Submit Application</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <p class="footer-title">William Chichi University</p>
+      <p>Ultra examina. Way beyond exams.</p>
+    </div>
+    <div>
+      <p>admissions@wcu.edu</p>
+      <p>Island Academic District, WCU Bay</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
