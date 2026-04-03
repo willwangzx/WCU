@@ -7,6 +7,8 @@ Guided by the motto, “ultra examina,” the university does not reject evaluat
 
 William Chi-Chi University strives to create an open, dynamic, and intellectually challenging environment where students are empowered not just to fit into the world, but to shape it.
 
+## [Go to the White paper](White-Paper.doc)
+
 ## Project Mind Map
 
 This project is a static university website organized around shared page layouts, a single main stylesheet, and a lightweight JavaScript layer.
