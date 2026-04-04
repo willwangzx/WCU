@@ -1,38 +1,17 @@
 # William Chichi University
 
-Static website concept for William Chichi University.
+## Welcome to William CHi-CHi University
+William Chi-Chi University is an innovative institution dedicated to cultivating independent thinkers and real-world problem solvers. The university believes that education should go beyond exams and focus on developing the ability to apply knowledge meaningfully.
 
-## Project Structure
+At William Chi-Chi University, learning extends far beyond the classroom. Through project-based learning, interdisciplinary collaboration, and continuous exploration, students are encouraged to question assumptions, challenge conventional answers, and build their own understanding through experience.
 
-```text
-.
-|-- index.html
-|-- assets/
-|   |-- css/
-|   |   `-- styles.css
-|   `-- js/
-|       `-- script.js
-`-- pages/
-    |-- about.html
-    |-- academics.html
-    |-- admissions.html
-    |-- apply.html
-    |-- campus.html
-    |-- news.html
-    |-- research.html
-    `-- schools/
-        |-- school-art-and-literature.html
-        |-- school-business-and-management.html
-        |-- school-computer-science-and-mathematics.html
-        |-- school-engineering-and-natural-science.html
-        |-- school-humanities-and-social-science.html
-        `-- school-interdisciplinary-studies.html
-```
+Guided by the motto, “ultra examina,” the university does not reject evaluation, but rather redefines its purpose. Grades are not the ultimate measure of success—what truly matters is critical thinking, creativity, and the ability to make an impact.
 
-## Notes
+William Chi-Chi University strives to create an open, dynamic, and intellectually challenging environment where students are empowered not just to fit into the world, but to shape it.
 
-- `index.html` remains at the repo root as the main entry page.
-- Shared styles and scripts now live under `assets/`.
-- General content pages now live under `pages/`.
-- School detail pages now live under `pages/schools/`.
-- Internal links and asset paths were updated to match the new layout.
+
+
+## Reference Docs
+
+- [Go to the White paper](docs/White-Paper.doc)
+- [Project Mind Map](docs/mindmap.md)
