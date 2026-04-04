@@ -1,4 +1,4 @@
-# Project Mind Map
+﻿# Project Mind Map
 
 This project is a static university website organized around shared page layouts, a single main stylesheet, and a lightweight JavaScript layer.
 
@@ -116,3 +116,43 @@ William Chi-Chi University Website
 3. The six `school-*.html` pages to see the repeated school-page pattern.
 4. `styles.css` to understand the shared design system and layout rules.
 5. `script.js` and the inline script in `academics.html` for interaction behavior.
+
+## Current structure
+```text
+.
+|-- index.html
+|-- README.md
+|-- assets/
+|   |-- css/
+|   |   `-- styles.css
+|   `-- js/
+|       `-- script.js
+|-- docs/
+|   |-- White-Paper.doc
+|   `-- mindmap.md
+`-- pages/
+    |-- about.html
+    |-- academics.html
+    |-- admissions.html
+    |-- apply.html
+    |-- campus.html
+    |-- news.html
+    |-- research.html
+    `-- schools/
+        |-- school-art-and-literature.html
+        |-- school-business-and-management.html
+        |-- school-computer-science-and-mathematics.html
+        |-- school-engineering-and-natural-science.html
+        |-- school-humanities-and-social-science.html
+        `-- school-interdisciplinary-studies.html
+```
+
+## Notes
+
+- `index.html` remains at the repo root as the main entry page.
+- Shared styles and scripts now live under `assets/`.
+- General content pages now live under `pages/`.
+- School detail pages now live under `pages/schools/`.
+- `docs/` stores non-deploy web materials such as planning notes or white papers.
+- Internal links and asset paths were updated to match the new layout.
+
