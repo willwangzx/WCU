@@ -1,20 +1,4 @@
-# William Chichi University
-
-## Welcome to William CHi-CHi University
-
-William Chi-Chi University is an innovative institution dedicated to cultivating independent thinkers and real-world problem solvers. The university believes that education should go beyond exams and focus on developing the ability to apply knowledge meaningfully.
-
-At William Chi-Chi University, learning extends far beyond the classroom. Through project-based learning, interdisciplinary collaboration, and continuous exploration, students are encouraged to question assumptions, challenge conventional answers, and build their own understanding through experience.
-
-Guided by the motto, "ultra examina," the university does not reject evaluation, but rather redefines its purpose. Grades are not the ultimate measure of success. What truly matters is critical thinking, creativity, and the ability to make an impact.
-
-William Chi-Chi University strives to create an open, dynamic, and intellectually challenging environment where students are empowered not just to fit into the world, but to shape it.
-
-## [Go to the White paper](White-Paper.doc)
-
-Further managment in imrpoving the website and adding new features are all in the White-Paper doc.
-
-## Project Mind Map
+﻿# Project Mind Map
 
 This project is a static university website organized around shared page layouts, a single main stylesheet, and a lightweight JavaScript layer.
 
@@ -125,10 +109,50 @@ William Chi-Chi University Website
         Submission is simulated in the browser only
 ```
 
-## Quick Reading instructions
+## Quick Reading Instructions
 
 1. `index.html` to understand the homepage tone and structure.
 2. `academics.html` to understand the biggest content hub.
 3. The six `school-*.html` pages to see the repeated school-page pattern.
 4. `styles.css` to understand the shared design system and layout rules.
 5. `script.js` and the inline script in `academics.html` for interaction behavior.
+
+## Current structure
+```text
+.
+|-- index.html
+|-- README.md
+|-- assets/
+|   |-- css/
+|   |   `-- styles.css
+|   `-- js/
+|       `-- script.js
+|-- docs/
+|   |-- White-Paper.doc
+|   `-- mindmap.md
+`-- pages/
+    |-- about.html
+    |-- academics.html
+    |-- admissions.html
+    |-- apply.html
+    |-- campus.html
+    |-- news.html
+    |-- research.html
+    `-- schools/
+        |-- school-art-and-literature.html
+        |-- school-business-and-management.html
+        |-- school-computer-science-and-mathematics.html
+        |-- school-engineering-and-natural-science.html
+        |-- school-humanities-and-social-science.html
+        `-- school-interdisciplinary-studies.html
+```
+
+## Notes
+
+- `index.html` remains at the repo root as the main entry page.
+- Shared styles and scripts now live under `assets/`.
+- General content pages now live under `pages/`.
+- School detail pages now live under `pages/schools/`.
+- `docs/` stores non-deploy web materials such as planning notes or white papers.
+- Internal links and asset paths were updated to match the new layout.
+
