@@ -6,23 +6,29 @@
   <title>School of Engineering and Natural Science | William Chichi University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/styles.css" />
 </head>
 <body>
+  <div class="loading-screen" id="loadingScreen" aria-hidden="true">
+    <svg class="loading-mark" viewBox="0 0 120 120" role="img" aria-label="WCU loading mark">
+      <path d="M18 20 L36 98 L60 42 L84 98 L102 20" />
+    </svg>
+  </div>
+
   <header class="site-header">
-    <a class="brand" href="index.html"><span class="brand-mark">W</span><span class="brand-text">William Chichi University</span></a>
+    <a class="brand" href="../../index.html"><span class="brand-mark">W</span><span class="brand-text">William Chichi University</span></a>
     <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navMenu">Menu</button>
     <nav id="navMenu" class="site-nav" aria-label="Primary">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a class="active" href="academics.html">Academics</a>
-      <a href="campus.html">Campus</a>
-      <a href="admissions.html">Admissions</a>
-      <a href="research.html">Research</a>
-      <a href="news.html">News</a>
+      <a href="../../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a class="active" href="../academics.html">Academics</a>
+      <a href="../campus.html">Campus</a>
+      <a href="../admissions.html">Admissions</a>
+      <a href="../research.html">Research</a>
+      <a href="../news.html">News</a>
     </nav>
-    <a class="btn btn-outline" href="admissions.html">Apply Now</a>
+    <a class="btn btn-outline" href="../admissions.html">Apply Now</a>
   </header>
 
   <section class="page-hero school-hero">
@@ -30,7 +36,7 @@
       <p class="eyebrow">COLLEGES AND SCHOOLS</p>
       <h1>School of Engineering and Natural Science</h1>
       <p class="page-intro">Engineers and scientists work side by side to solve real-world problems in energy, health, materials, and sustainable infrastructure.</p>
-      <a class="text-link" href="academics.html#colleges-schools">Back to Colleges and Schools</a>
+      <a class="text-link" href="../academics.html#colleges-schools">Back to Colleges and Schools</a>
     </div>
   </section>
 
@@ -116,6 +122,10 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="../../assets/js/script.js"></script>
 </body>
 </html>
+
+
+
+

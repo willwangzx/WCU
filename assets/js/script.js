@@ -39,11 +39,25 @@ if ("IntersectionObserver" in window) {
 }
 
 const applicationForm = document.getElementById("applicationForm");
+const applicationMessage = document.getElementById("applicationMessage");
+
 if (applicationForm) {
   applicationForm.addEventListener("submit", (event) => {
     if (!applicationForm.checkValidity()) {
       event.preventDefault();
+      if (applicationMessage) {
+        applicationMessage.textContent = "";
+        applicationMessage.classList.remove("form-note-success");
+      }
       applicationForm.reportValidity();
+      return;
+    }
+
+    event.preventDefault();
+
+    if (applicationMessage) {
+      applicationMessage.textContent = "Thank you. Your required confirmation has been completed, and your application is ready for review.";
+      applicationMessage.classList.add("form-note-success");
     }
   });
 }
