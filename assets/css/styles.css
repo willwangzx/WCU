@@ -1163,3 +1163,69 @@ section[id] {
   margin-bottom: 10px;
   color: var(--muted);
 }
+
+.application-step-bar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.application-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 600;
+  text-align: center;
+}
+
+.application-step span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: #edf2fb;
+  color: var(--text);
+  font-size: 0.88rem;
+}
+
+.application-step.active {
+  border-color: rgba(31, 93, 255, 0.24);
+  background: linear-gradient(180deg, rgba(31, 93, 255, 0.08), rgba(31, 93, 255, 0.03));
+  color: var(--text);
+}
+
+.application-step.active span,
+.application-step.completed span {
+  background: var(--accent);
+  color: #fff;
+}
+
+.application-step.completed {
+  color: var(--text);
+}
+
+.application-form-shell {
+  display: grid;
+  gap: 24px;
+}
+
+.application-lead {
+  margin-bottom: 0;
+}
+
+.application-actions-split {
+  margin-top: 28px;
+}
+
+@media (max-width: 980px) {
+  .application-step-bar {
+    grid-template-columns: 1fr;
+  }
+}
