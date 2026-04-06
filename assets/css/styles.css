@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #f7f8fb;
   --surface: #ffffff;
   --text: #0b1f3a;
@@ -1086,4 +1086,80 @@ section[id] {
 
 .school-page-main .section:last-child {
   border-bottom: none;
+}
+
+.success-hero {
+  background:
+    radial-gradient(circle at top right, rgba(90, 204, 165, 0.22), transparent 28%),
+    linear-gradient(145deg, #103152, #1f5b6a);
+}
+
+.success-summary {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top right, rgba(90, 204, 165, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff, #f5faf8);
+}
+
+.success-summary h2 {
+  margin: 14px 0 12px;
+  font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+}
+
+.success-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.success-check {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #25b36a, #15834a);
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 700;
+  box-shadow: 0 18px 40px rgba(21, 131, 74, 0.22);
+  flex-shrink: 0;
+}
+
+.success-badge {
+  display: inline-block;
+  padding: 0;
+  background: transparent;
+  color: #146c43;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1.05;
+  font-weight: 700;
+}
+
+.success-next {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 32px;
+  background:
+    linear-gradient(180deg, rgba(31, 93, 255, 0.05), transparent),
+    var(--surface);
+}
+
+.success-next h2 {
+  margin: 10px 0 14px;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+}
+
+.success-next-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.success-next-list li {
+  margin-bottom: 10px;
+  color: var(--muted);
 }
