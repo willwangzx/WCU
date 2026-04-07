@@ -32,7 +32,7 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
     `-- schools/
         |-- school-art-and-literature.html
         |-- school-business-and-management.html
-        |-- school-computer-science-and-mathematics.html
+        |-- school-mathematics-and-computer-science.html
         |-- school-engineering-and-natural-science.html
         |-- school-humanities-and-social-science.html
         `-- school-interdisciplinary-studies.html

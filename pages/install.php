@@ -1,30 +1,25 @@
 <?php
 /**
  * Database Installation Script for WCU Applications
- * 
+ *
  * This script will:
  * 1. Create the database 'wcu_applications' if it doesn't exist.
  * 2. Create the table 'applications' with all required fields.
  * 3. Optionally insert sample data for testing.
- * 
+ *
  * Usage: Run this script once via browser or command line.
  * After installation, you may delete this file for security.
  */
 
-// ========== Configuration ==========
+// Configuration
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'wcu_applications');
-define('DB_USER', 'chichi');      // Change to your database username
-define('DB_PASS', 'williamchichi');  // Change to your database password
+define('DB_USER', 'chichi');
+define('DB_PASS', 'williamchichi');
 define('DB_CHARSET', 'utf8mb4');
-
-// Set to true if you want to drop existing table and recreate (erases all data)
 define('FORCE_RECREATE_TABLE', false);
-
-// Set to true to insert sample application records
 define('INSERT_SAMPLE_DATA', true);
 
-// ========== NO EDIT BELOW THIS LINE ==========
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -37,34 +32,30 @@ function addMessage($msg, $type = 'info') {
 }
 
 try {
-    // Step 1: Connect without database (to create it if needed)
-    addMessage("Connecting to MySQL server...");
-    $pdo = new PDO("mysql:host=" . DB_HOST . ";charset=" . DB_CHARSET, DB_USER, DB_PASS, [
+    addMessage('Connecting to MySQL server...');
+    $pdo = new PDO('mysql:host=' . DB_HOST . ';charset=' . DB_CHARSET, DB_USER, DB_PASS, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
-    addMessage("Connected successfully.");
+    addMessage('Connected successfully.');
 
-    // Step 2: Create database if not exists
-    addMessage("Checking/Creating database `" . DB_NAME . "`...");
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET " . DB_CHARSET . " COLLATE " . DB_CHARSET . "_unicode_ci");
-    addMessage("Database `" . DB_NAME . "` is ready.");
+    addMessage('Checking or creating database `' . DB_NAME . '`...');
+    $pdo->exec('CREATE DATABASE IF NOT EXISTS `' . DB_NAME . '` CHARACTER SET ' . DB_CHARSET . ' COLLATE ' . DB_CHARSET . '_unicode_ci');
+    addMessage('Database `' . DB_NAME . '` is ready.');
 
-    // Step 3: Use the database
-    $pdo->exec("USE `" . DB_NAME . "`");
-    addMessage("Using database `" . DB_NAME . "`.");
+    $pdo->exec('USE `' . DB_NAME . '`');
+    addMessage('Using database `' . DB_NAME . '`.');
 
-    // Step 4: Create table `applications`
     $tableExists = $pdo->query("SHOW TABLES LIKE 'applications'")->rowCount() > 0;
-    
+
     if ($tableExists && FORCE_RECREATE_TABLE) {
-        addMessage("Table `applications` exists. Dropping it (FORCE_RECREATE_TABLE = true)...", 'warning');
-        $pdo->exec("DROP TABLE `applications`");
+        addMessage('Table `applications` exists. Dropping it because FORCE_RECREATE_TABLE is true...', 'warning');
+        $pdo->exec('DROP TABLE `applications`');
         $tableExists = false;
     }
 
     if (!$tableExists) {
-        addMessage("Creating table `applications`...");
+        addMessage('Creating table `applications`...');
         $sql = "CREATE TABLE `applications` (
             `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
             `first_name` VARCHAR(100) NOT NULL,
@@ -87,19 +78,18 @@ try {
             KEY `idx_program` (`program`),
             KEY `idx_created_at` (`created_at`)
         ) ENGINE=InnoDB DEFAULT CHARSET=" . DB_CHARSET . " COLLATE=" . DB_CHARSET . "_unicode_ci";
-        
+
         $pdo->exec($sql);
-        addMessage("Table `applications` created successfully.", 'success');
+        addMessage('Table `applications` created successfully.', 'success');
     } else {
-        addMessage("Table `applications` already exists. Skipping creation.", 'info');
+        addMessage('Table `applications` already exists. Skipping creation.', 'info');
     }
 
-    // Step 5: Insert sample data (optional)
     if (INSERT_SAMPLE_DATA) {
-        // Check if table is empty
-        $count = $pdo->query("SELECT COUNT(*) FROM `applications`")->fetchColumn();
+        $count = $pdo->query('SELECT COUNT(*) FROM `applications`')->fetchColumn();
+
         if ($count == 0) {
-            addMessage("Inserting sample application records...", 'info');
+            addMessage('Inserting sample application records...', 'info');
             $sampleData = [
                 [
                     'first_name' => 'Jane',
@@ -108,7 +98,7 @@ try {
                     'phone' => '+1 555 123 4567',
                     'citizenship' => 'United States',
                     'entry_term' => 'Fall 2026',
-                    'program' => 'Computer Science and Mathematics',
+                    'program' => 'School of Mathematics and Computer Science',
                     'school_name' => 'Springfield High School',
                     'personal_statement' => 'I have always been fascinated by algorithms and mathematical proofs. I want to combine both at WCU to work on AI for social good.',
                     'portfolio_url' => 'https://github.com/janedoe/portfolio',
@@ -124,9 +114,9 @@ try {
                     'phone' => '+52 55 1234 5678',
                     'citizenship' => 'Mexico',
                     'entry_term' => 'Spring 2027',
-                    'program' => 'Engineering and Natural Science',
+                    'program' => 'School of Engineering and Natural Science',
                     'school_name' => 'Prepa Tec',
-                    'personal_statement' => 'My passion for renewable energy drives me to study sustainable engineering. WCU’s lab facilities are unmatched.',
+                    'personal_statement' => "My passion for renewable energy drives me to study sustainable engineering. WCU's lab facilities are unmatched.",
                     'portfolio_url' => 'https://carlosmendez.dev/projects',
                     'additional_notes' => 'Built a solar-powered water purifier.',
                     'ip_address' => '10.0.0.5',
@@ -134,7 +124,7 @@ try {
                     'created_at' => date('Y-m-d H:i:s')
                 ]
             ];
-            
+
             $insertSql = "INSERT INTO `applications` (
                 first_name, last_name, email, phone, citizenship, entry_term, program,
                 school_name, personal_statement, portfolio_url, additional_notes,
@@ -144,27 +134,25 @@ try {
                 :school_name, :personal_statement, :portfolio_url, :additional_notes,
                 :ip_address, :user_agent, :created_at
             )";
-            
+
             $stmt = $pdo->prepare($insertSql);
             foreach ($sampleData as $row) {
                 $stmt->execute($row);
             }
-            addMessage("Inserted " . count($sampleData) . " sample application(s).", 'success');
+            addMessage('Inserted ' . count($sampleData) . ' sample application(s).', 'success');
         } else {
-            addMessage("Table `applications` already contains data. Skipping sample insertion.", 'info');
+            addMessage('Table `applications` already contains data. Skipping sample insertion.', 'info');
         }
     }
 
-    addMessage("Database initialization completed successfully!", 'success');
-    
+    addMessage('Database initialization completed successfully!', 'success');
 } catch (PDOException $e) {
     $error = true;
-    addMessage("Database error: " . $e->getMessage(), 'danger');
+    addMessage('Database error: ' . $e->getMessage(), 'danger');
 } catch (Exception $e) {
     $error = true;
-    addMessage("General error: " . $e->getMessage(), 'danger');
+    addMessage('General error: ' . $e->getMessage(), 'danger');
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -256,31 +244,23 @@ try {
         .btn:hover {
             opacity: 0.9;
         }
-        pre {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 1rem;
-            border-radius: 12px;
-            overflow-x: auto;
-            font-size: 0.8rem;
-        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🔧 WCU Applications Database Setup</h1>
+    <h1>WCU Applications Database Setup</h1>
     <p>This script will create the database <strong><?php echo DB_NAME; ?></strong> and the <strong>applications</strong> table.</p>
-    
+
     <?php if ($error): ?>
         <div class="alert">
-            ❌ Setup encountered errors. Please check messages below and fix your configuration.
+            Setup encountered errors. Please check messages below and fix your configuration.
         </div>
     <?php else: ?>
         <div class="success-box">
-            ✅ Setup completed without fatal errors.
+            Setup completed without fatal errors.
         </div>
     <?php endif; ?>
-    
+
     <div class="message-list">
         <?php foreach ($output as $msg): ?>
             <div class="message <?php echo $msg['type']; ?>">
@@ -288,15 +268,15 @@ try {
             </div>
         <?php endforeach; ?>
     </div>
-    
+
     <hr>
     <div>
-        <a href="apply.php" class="btn">📝 Go to Application Form</a>
-        <a href="#" class="btn btn-secondary" onclick="window.location.reload();">⟳ Run Again</a>
+        <a href="apply.php" class="btn">Go to Application Form</a>
+        <a href="#" class="btn btn-secondary" onclick="window.location.reload();">Run Again</a>
     </div>
-    
+
     <div class="footer">
-        <p>⚠️ For security, <strong>delete this file (install.php)</strong> after successful installation.</p>
+        <p>For security, <strong>delete this file (install.php)</strong> after successful installation.</p>
         <p>Database: <?php echo DB_NAME; ?> | Table: applications</p>
     </div>
 </div>

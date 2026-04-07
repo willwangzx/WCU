@@ -1,4 +1,4 @@
-﻿# Project Mind Map
+# Project Mind Map
 
 This project is a static university website organized around shared page layouts, a single main stylesheet, and a lightweight JavaScript layer.
 
@@ -51,7 +51,7 @@ William Chi-Chi University Website
 |   |   - Continue education
 |   |
 |   `-- School detail pages
-|       |-- school-computer-science-and-mathematics.html
+|       |-- school-mathematics-and-computer-science.html
 |       |-- school-engineering-and-natural-science.html
 |       |-- school-interdisciplinary-studies.html
 |       |-- school-art-and-literature.html
@@ -141,7 +141,7 @@ William Chi-Chi University Website
     `-- schools/
         |-- school-art-and-literature.html
         |-- school-business-and-management.html
-        |-- school-computer-science-and-mathematics.html
+        |-- school-mathematics-and-computer-science.html
         |-- school-engineering-and-natural-science.html
         |-- school-humanities-and-social-science.html
         `-- school-interdisciplinary-studies.html
