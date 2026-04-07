@@ -53,7 +53,8 @@ if (applicationForm) {
       return;
     }
 
-    event.preventDefault();
+    // event.preventDefault();
+    //这行是ban掉交表单的代码，所以我给它注释掉
 
     if (applicationMessage) {
       applicationMessage.textContent = "Thank you. Your required confirmation has been completed, and your application is ready for review.";
