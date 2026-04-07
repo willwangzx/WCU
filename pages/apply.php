@@ -13,7 +13,7 @@
 session_start();
 
 // ========== Configuration ==========
-//这五个是数据库名称和账密
+// Database credentials
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'wcu_applications');
 define('DB_USER', 'chichi');      // Change to your database username
@@ -28,12 +28,12 @@ define('FROM_NAME', 'WCU Admissions Office');
 // Application year/term options (must match frontend select)
 $valid_terms = ['Fall 2026', 'Spring 2027'];
 $valid_programs = [
-    'Mathematics and Computer Science',
-    'Engineering and Natural Science',
-    'Business and Management',
-    'Art and Literature',
-    'Humanities and Social Science',
-    'Interdisciplinary Studies'
+    'School of Mathematics and Computer Science',
+    'School of Engineering and Natural Science',
+    'School of Business and Management',
+    'School of Art and Literature',
+    'School of Humanities and Social Science',
+    'School of Interdisciplinary Studies'
 ];
 
 // ========== Helper Functions ==========
@@ -70,14 +70,14 @@ function getDBConnection() {
 // Send confirmation email to applicant
 function sendConfirmationEmail($data) {
     $to = $data['email'];
-    $subject = "WCU Application Received �?" . $data['first_name'] . " " . $data['last_name'];
+    $subject = "WCU Application Received - " . $data['first_name'] . " " . $data['last_name'];
     $fullName = $data['first_name'] . " " . $data['last_name'];
     $program = $data['program'];
     $term = $data['entry_term'];
     
     $message = "Dear {$fullName},\n\n";
     $message .= "Thank you for applying to William Chichi University. We have successfully received your application for the {$program} program, {$term} entry.\n\n";
-    $message .= "Our admissions committee will review your materials. You will receive an admission decision within 4�? weeks.\n\n";
+    $message .= "Our admissions committee will review your materials. You will receive an admission decision within 4-6 weeks.\n\n";
     $message .= "If you have any questions, please contact us at admissions@wcu.edu.\n\n";
     $message .= "Best regards,\nWCU Admissions Team\n\n";
     $message .= "Ultra examina. Way beyond exams.";
@@ -247,7 +247,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 
                 // Redirect to success page (PRG pattern)
-                header('Location: apply.php?success=1');
+                if (!empty($_POST['split-flow'])) {
+                    header('Location: application-success.html');
+                } else {
+                    header('Location: apply.php?success=1');
+                }
                 exit;
                 
             } catch (PDOException $e) {

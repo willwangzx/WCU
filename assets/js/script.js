@@ -96,6 +96,83 @@ function enableAutosave(form, storageKey) {
   form.addEventListener("change", () => saveFormData(form, storageKey));
 }
 
+async function ensureSplitFlowCsrfToken(form) {
+  const tokenField = form.querySelector("#splitFlowCsrfToken");
+  if (!tokenField || tokenField.value) {
+    return tokenField?.value || "";
+  }
+
+  const response = await fetch("apply.php", {
+    credentials: "same-origin",
+    headers: {
+      "X-Requested-With": "fetch"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to load application security token.");
+  }
+
+  const html = await response.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const remoteToken = doc.querySelector('input[name="csrf_token"]');
+
+  if (!remoteToken || !remoteToken.value) {
+    throw new Error("Application security token is missing.");
+  }
+
+  tokenField.value = remoteToken.value;
+  return tokenField.value;
+}
+
+function normalizeProgramName(program) {
+  const map = {
+    "School of Mathematics and Computer Science": "School of Mathematics and Computer Science",
+    "School of Engineering and Natural Science": "School of Engineering and Natural Science",
+    "School of Business and Management": "School of Business and Management",
+    "School of Art and Literature": "School of Art and Literature",
+    "School of Humanities and Social Science": "School of Humanities and Social Science",
+    "School of Interdisciplinary Studies": "School of Interdisciplinary Studies"
+  };
+
+  return map[program] || program;
+}
+
+function populateSplitApplicationPayload(form) {
+  const basicValue = sessionStorage.getItem(storageKeys.basic);
+
+  if (!basicValue) {
+    throw new Error("Basic information is missing.");
+  }
+
+  const basicData = JSON.parse(basicValue);
+  const fieldMap = {
+    firstName: "splitFirstName",
+    lastName: "splitLastName",
+    email: "splitEmail",
+    phone: "splitPhone",
+    Nationality: "splitCitizenship",
+    entryTerm: "splitEntryTerm",
+    program: "splitProgram",
+    schoolName: "splitSchoolName"
+  };
+
+  Object.entries(fieldMap).forEach(([sourceKey, targetId]) => {
+    const target = form.querySelector(`#${targetId}`);
+    if (!target) {
+      return;
+    }
+
+    if (sourceKey === "program") {
+      target.value = normalizeProgramName(basicData[sourceKey] || "");
+      return;
+    }
+
+    target.value = basicData[sourceKey] || "";
+  });
+}
+
 if (basicForm) {
   loadFormData(basicForm, storageKeys.basic);
   enableAutosave(basicForm, storageKeys.basic);
@@ -119,15 +196,26 @@ if (writingForm) {
   } else {
     loadFormData(writingForm, storageKeys.writing);
     enableAutosave(writingForm, storageKeys.writing);
+    void ensureSplitFlowCsrfToken(writingForm).catch(() => {});
 
-    writingForm.addEventListener("submit", (event) => {
+    writingForm.addEventListener("submit", async (event) => {
       if (!writingForm.checkValidity()) {
         event.preventDefault();
         writingForm.reportValidity();
         return;
       }
 
+      event.preventDefault();
       saveFormData(writingForm, storageKeys.writing);
+
+      try {
+        populateSplitApplicationPayload(writingForm);
+        await ensureSplitFlowCsrfToken(writingForm);
+        writingForm.submit();
+      } catch (error) {
+        console.error(error);
+        window.alert("We could not prepare your application for submission. Please refresh the page and try again.");
+      }
     });
   }
 }
