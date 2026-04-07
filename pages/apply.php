@@ -52,6 +52,11 @@ function verifyCSRFToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
+if (isset($_GET['csrf']) && $_GET['csrf'] === '1') {
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode(['csrf_token' => generateCSRFToken()]);
+    exit;
+}
 function getDBConnection() {
     try {
         $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
@@ -248,9 +253,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Redirect to success page (PRG pattern)
                 if (!empty($_POST['split-flow'])) {
-                    header('Location: application-success.html');
+                    header('Location: application-success.html', true, 303);
                 } else {
-                    header('Location: apply.php?success=1');
+                    header('Location: apply.php?success=1', true, 303);
                 }
                 exit;
                 

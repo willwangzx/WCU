@@ -60,9 +60,9 @@ a {
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 240;
-  stroke-dashoffset: 240;
-  animation: draw 1.3s ease forwards;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: draw 0.5s ease forwards;
 }
 
 @keyframes draw {

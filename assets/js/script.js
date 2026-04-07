@@ -14,7 +14,7 @@ window.addEventListener("load", () => {
   if (loadingScreen) {
     setTimeout(() => {
       loadingScreen.classList.add("hidden");
-    }, 560);
+    }, 600);
   }
 
   if (currentPage === "application-success.html") {
@@ -102,10 +102,10 @@ async function ensureSplitFlowCsrfToken(form) {
     return tokenField?.value || "";
   }
 
-  const response = await fetch("apply.php", {
+  const response = await fetch("apply.php?csrf=1", {
     credentials: "same-origin",
     headers: {
-      "X-Requested-With": "fetch"
+      Accept: "application/json"
     }
   });
 
@@ -113,16 +113,13 @@ async function ensureSplitFlowCsrfToken(form) {
     throw new Error("Unable to load application security token.");
   }
 
-  const html = await response.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  const remoteToken = doc.querySelector('input[name="csrf_token"]');
+  const payload = await response.json();
 
-  if (!remoteToken || !remoteToken.value) {
+  if (!payload.csrf_token) {
     throw new Error("Application security token is missing.");
   }
 
-  tokenField.value = remoteToken.value;
+  tokenField.value = payload.csrf_token;
   return tokenField.value;
 }
 
@@ -147,6 +144,22 @@ function populateSplitApplicationPayload(form) {
   }
 
   const basicData = JSON.parse(basicValue);
+  const requiredBasicKeys = [
+    "firstName",
+    "lastName",
+    "email",
+    "phone",
+    "Nationality",
+    "entryTerm",
+    "program",
+    "schoolName"
+  ];
+
+  const missingKey = requiredBasicKeys.find((key) => !String(basicData[key] || "").trim());
+  if (missingKey) {
+    throw new Error(`Missing required basic information: ${missingKey}`);
+  }
+
   const fieldMap = {
     firstName: "splitFirstName",
     lastName: "splitLastName",
@@ -228,3 +241,4 @@ if (applicationForm) {
     }
   });
 }
+
