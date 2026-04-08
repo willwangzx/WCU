@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>News | William Chichi University</title>
+  <title>News Detail | William Chichi University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -33,24 +33,15 @@
 
   <section class="page-hero">
     <div class="inner reveal">
-      <p class="eyebrow">News & Updates</p>
-      <h1>University stories, announcements, and milestones.</h1>
-      <p class="page-intro">A dynamic newsroom driven by a structured data source, so every displayed update can be managed in one place.</p>
+      <p class="eyebrow">News Story</p>
+      <h1>Newsroom</h1>
+      <p class="page-intro">Detailed report and context for the selected university update.</p>
     </div>
   </section>
 
-  <main class="news-main">
-    <section class="section reveal news-featured-wrap" id="featuredNews" aria-live="polite"></section>
-
+  <main class="news-detail-main">
     <section class="section reveal">
-      <div class="news-toolbar">
-        <div class="news-filters" id="newsFilters" aria-label="Filter stories by category"></div>
-        <p class="news-result-count" id="newsResultCount">0 stories</p>
-      </div>
-      <div class="news-grid" id="newsRoot" aria-live="polite"></div>
-      <noscript>
-        <p class="news-empty">Please enable JavaScript to view the latest news feed.</p>
-      </noscript>
+      <article class="news-detail-article" id="newsDetailRoot" aria-live="polite"></article>
     </section>
   </main>
 
@@ -67,6 +58,6 @@
 
   <script src="../assets/js/script.js"></script>
   <script src="../assets/js/news-database.js"></script>
-  <script src="../assets/js/news-page.js"></script>
+  <script src="../assets/js/news-detail-page.js"></script>
 </body>
 </html>
