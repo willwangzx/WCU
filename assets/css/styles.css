@@ -611,20 +611,104 @@ section[id] {
   color: var(--muted);
 }
 
-.admissions-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 .admissions-info-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
-.admissions-steps {
+.admissions-process-shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.admissions-process-intro,
+.admissions-process-note {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 28px;
   background:
-    linear-gradient(180deg, rgba(31, 93, 255, 0.06), transparent),
+    linear-gradient(180deg, rgba(31, 93, 255, 0.05), transparent),
     var(--surface);
+}
+
+.admissions-process-intro h2 {
+  margin: 8px 0 14px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.admissions-process-intro p:last-child {
+  margin: 0;
+  color: var(--muted);
+  max-width: 760px;
+}
+
+.admissions-process-rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.process-step-card {
+  position: relative;
+  min-height: 220px;
+  padding: 28px 24px 24px;
+  border: 1px solid rgba(31, 93, 255, 0.12);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(31, 93, 255, 0.08), transparent 38%),
+    linear-gradient(180deg, #ffffff, #f5f8fc);
+  box-shadow: 0 16px 40px rgba(10, 27, 49, 0.06);
+}
+
+.process-step-card h3 {
+  margin: 12px 0 10px;
+}
+
+.process-step-card p:last-child {
+  margin: 0;
+  color: var(--muted);
+}
+
+.process-step-number {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: rgba(11, 31, 58, 0.54);
+}
+
+.admissions-process-note {
+  border-color: rgba(31, 93, 255, 0.14);
+  background:
+    radial-gradient(circle at top right, rgba(110, 190, 255, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(31, 93, 255, 0.08), rgba(255, 255, 255, 0.96));
+  color: var(--text);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  align-items: start;
+  box-shadow: 0 14px 36px rgba(12, 32, 58, 0.05);
+}
+
+.process-note-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(11, 31, 58, 0.58);
+}
+
+.admissions-process-note ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.admissions-process-note li {
+  margin-bottom: 12px;
+  color: rgba(11, 31, 58, 0.78);
 }
 
 .admissions-checklist {
@@ -977,16 +1061,22 @@ section[id] {
     grid-template-columns: 1fr;
   }
 
-  .admissions-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .admissions-cta-actions {
     justify-content: flex-start;
   }
 
   .application-panel {
     position: static;
+  }
+
+  .admissions-process-shell,
+  .admissions-process-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .admissions-process-note {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
