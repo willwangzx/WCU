@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Writing Desk | William Chichi University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+  <div class="loading-screen" id="loadingScreen" aria-hidden="true">
+    <svg class="loading-mark" viewBox="0 0 120 120" role="img" aria-label="WCU loading mark">
+      <path d="M18 20 L36 98 L60 42 L84 98 L102 20" />
+    </svg>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="../index.html"><span class="brand-mark">W</span><span class="brand-text">William Chichi University</span></a>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navMenu">Menu</button>
+    <nav id="navMenu" class="site-nav" aria-label="Primary">
+      <a href="../index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="academics.html">Academics</a>
+      <a href="campus.html">Campus</a>
+      <a href="admissions.html">Admissions</a>
+      <a href="research.html">Research</a>
+      <a class="active" href="news.html">News</a>
+    </nav>
+    <a class="btn btn-outline" href="apply.html">Apply Now</a>
+  </header>
+
+  <section class="page-hero">
+    <div class="inner reveal">
+      <p class="eyebrow">Editorial Tool</p>
+      <h1>Content Writing Desk</h1>
+      <p class="page-intro">Draft and preview article content locally. Server publishing is intentionally left unconnected for now.</p>
+    </div>
+  </section>
+
+  <main>
+    <section class="section reveal writer-shell">
+      <form id="contentWriterForm" class="writer-workspace" novalidate>
+        <section class="application-form writer-panel">
+          <h2>Article Details</h2>
+          <div class="application-form-grid">
+            <div class="form-field">
+              <label for="newsId">News ID <span class="required-mark">*</span></label>
+              <input id="newsId" name="id" type="text" placeholder="example: n-2026-04-08-new-story" required />
+            </div>
+            <div class="form-field">
+              <label for="newsDate">Date <span class="required-mark">*</span></label>
+              <input id="newsDate" name="date" type="date" required />
+            </div>
+            <div class="form-field form-field-full">
+              <label for="newsTitle">Title <span class="required-mark">*</span></label>
+              <input id="newsTitle" name="title" type="text" placeholder="Story title" required />
+            </div>
+            <div class="form-field">
+              <label for="newsCategory">Category <span class="required-mark">*</span></label>
+              <select id="newsCategory" name="category" required>
+                <option value="">Select category</option>
+                <option>Research</option>
+                <option>Academics</option>
+                <option>Admissions</option>
+                <option>Campus</option>
+                <option>General</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="newsTag">Tag <span class="required-mark">*</span></label>
+              <input id="newsTag" name="tag" type="text" placeholder="example: Publication" required />
+            </div>
+            <div class="form-field form-field-full">
+              <label for="newsSummary">Summary <span class="required-mark">*</span></label>
+              <textarea id="newsSummary" name="summary" placeholder="One short summary paragraph for cards and headers." required></textarea>
+            </div>
+          </div>
+
+          <div class="writer-actions">
+            <button class="btn btn-outline" type="button" id="saveDraftBtn">Save Draft</button>
+            <button class="btn btn-outline" type="button" id="clearDraftBtn">Clear Draft</button>
+            <button class="btn btn-solid" type="button" id="copyJsonBtn">Copy JSON Entry</button>
+            <button class="btn btn-solid" type="button" id="publishBtn">Publish to Server (Not Connected)</button>
+          </div>
+
+          <p class="form-note" id="writerStatus">Draft autosave is active in this browser.</p>
+        </section>
+
+        <section class="writer-editor-shell">
+          <div class="writer-pane writer-editor-pane">
+            <div class="writer-pane-header">
+              <div>
+                <p class="writer-pane-label">Markdown Editor</p>
+                <p class="writer-pane-copy">Supports headings, bold, italic, lists, blockquotes, links, and code.</p>
+              </div>
+              <div class="writer-shortcuts" aria-hidden="true">
+                <span># Heading</span>
+                <span>**Bold**</span>
+                <span>- List</span>
+                <span>`Code`</span>
+              </div>
+            </div>
+            <div class="form-field form-field-full writer-markdown-field">
+              <label for="newsContent">Article Body <span class="required-mark">*</span></label>
+              <textarea id="newsContent" name="content" class="writer-markdown-input" placeholder="# Lead section&#10;&#10;Write in markdown here, just like a notes app.&#10;&#10;## Key points&#10;- First point&#10;- Second point&#10;&#10;> Pull quote or editorial note" required></textarea>
+            </div>
+          </div>
+
+          <article class="writer-preview writer-pane" id="writerPreview" aria-live="polite"></article>
+        </section>
+        
+        <p class="writer-export-note">The generated JSON includes both `markdown` and plain `content` paragraphs so it works with your current news data structure.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <p class="footer-title">William Chichi University</p>
+      <p>Ultra examina. Way beyond exams.</p>
+    </div>
+    <div>
+      <p>contact@wcu.edu</p>
+      <p>Island Academic District, WCU Bay</p>
+    </div>
+  </footer>
+
+  <script src="../assets/js/script.js"></script>
+  <script src="../assets/js/content-writer-page.js"></script>
+</body>
+</html>
