@@ -526,6 +526,56 @@ section[id] {
   color: rgba(255, 255, 255, 0.9);
 }
 
+.placeholder-page {
+  min-height: calc(100vh - 96px);
+  display: grid;
+  place-items: center;
+  padding: 48px 24px;
+  background:
+    radial-gradient(circle at top left, rgba(31, 93, 255, 0.1), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(184, 138, 45, 0.12), transparent 28%),
+    linear-gradient(180deg, #f7f9fd, #eef3fa);
+}
+
+.placeholder-card {
+  width: min(680px, 100%);
+  padding: clamp(32px, 5vw, 52px);
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 22px 56px rgba(10, 27, 49, 0.08);
+  text-align: center;
+}
+
+.placeholder-kicker {
+  margin: 0 0 14px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.placeholder-card h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+.placeholder-card p {
+  margin: 18px auto 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.placeholder-actions {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .admissions-hero {
   min-height: 62vh;
   background:
