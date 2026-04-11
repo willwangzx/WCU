@@ -5,6 +5,7 @@ const basicForm = document.getElementById("basicInformationForm");
 const writingForm = document.getElementById("writingMaterialsForm");
 const applicationForm = document.getElementById("applicationForm");
 const currentPage = window.location.pathname.split("/").pop();
+const siteConfig = window.WCU_CONFIG || {};
 const storageKeys = {
   basic: "wcuApplicationBasic",
   writing: "wcuApplicationWriting"
@@ -42,13 +43,38 @@ if ("IntersectionObserver" in window) {
       });
     },
     {
-      threshold: 0.12,
+      threshold: 0.12
     }
   );
 
   document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
 } else {
   document.querySelectorAll(".reveal").forEach((node) => node.classList.add("visible"));
+}
+
+function getApiBaseUrl() {
+  const configured = typeof siteConfig.apiBaseUrl === "string" ? siteConfig.apiBaseUrl.trim() : "";
+  return configured.replace(/\/+$/, "");
+}
+
+function getApplicationEndpoint() {
+  const apiBaseUrl = getApiBaseUrl();
+  return apiBaseUrl ? `${apiBaseUrl}/api/application.php` : "/api/application.php";
+}
+
+function getApplicationMessageNode(form) {
+  return form?.querySelector("#applicationMessage") || document.getElementById("applicationMessage");
+}
+
+function setApplicationMessage(form, message, type = "info") {
+  const messageNode = getApplicationMessageNode(form);
+  if (!messageNode) {
+    return;
+  }
+
+  messageNode.textContent = message;
+  messageNode.classList.toggle("error-note", type === "error");
+  messageNode.classList.toggle("success-note", type === "success");
 }
 
 function saveFormData(form, storageKey) {
@@ -96,33 +122,6 @@ function enableAutosave(form, storageKey) {
   form.addEventListener("change", () => saveFormData(form, storageKey));
 }
 
-async function ensureSplitFlowCsrfToken(form) {
-  const tokenField = form.querySelector("#splitFlowCsrfToken");
-  if (!tokenField || tokenField.value) {
-    return tokenField?.value || "";
-  }
-
-  const response = await fetch("apply.php?csrf=1", {
-    credentials: "same-origin",
-    headers: {
-      Accept: "application/json"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error("Unable to load application security token.");
-  }
-
-  const payload = await response.json();
-
-  if (!payload.csrf_token) {
-    throw new Error("Application security token is missing.");
-  }
-
-  tokenField.value = payload.csrf_token;
-  return tokenField.value;
-}
-
 function normalizeProgramName(program) {
   const map = {
     "School of Mathematics and Computer Science": "School of Mathematics and Computer Science",
@@ -136,7 +135,7 @@ function normalizeProgramName(program) {
   return map[program] || program;
 }
 
-function populateSplitApplicationPayload(form) {
+function buildSplitApplicationPayload(form) {
   const basicValue = sessionStorage.getItem(storageKeys.basic);
 
   if (!basicValue) {
@@ -149,6 +148,10 @@ function populateSplitApplicationPayload(form) {
     "lastName",
     "email",
     "phone",
+    "birthMonth",
+    "birthDay",
+    "birthYear",
+    "gender",
     "Nationality",
     "entryTerm",
     "program",
@@ -160,30 +163,61 @@ function populateSplitApplicationPayload(form) {
     throw new Error(`Missing required basic information: ${missingKey}`);
   }
 
-  const fieldMap = {
-    firstName: "splitFirstName",
-    lastName: "splitLastName",
-    email: "splitEmail",
-    phone: "splitPhone",
-    Nationality: "splitCitizenship",
-    entryTerm: "splitEntryTerm",
-    program: "splitProgram",
-    schoolName: "splitSchoolName"
+  const formData = new FormData(form);
+
+  return {
+    first_name: String(basicData.firstName || "").trim(),
+    last_name: String(basicData.lastName || "").trim(),
+    email: String(basicData.email || "").trim(),
+    phone: String(basicData.phone || "").trim(),
+    birth_month: String(basicData.birthMonth || "").trim(),
+    birth_day: String(basicData.birthDay || "").trim(),
+    birth_year: String(basicData.birthYear || "").trim(),
+    gender: String(basicData.gender || "").trim(),
+    citizenship: String(basicData.Nationality || "").trim(),
+    entry_term: String(basicData.entryTerm || "").trim(),
+    program: normalizeProgramName(String(basicData.program || "").trim()),
+    school_name: String(basicData.schoolName || "").trim(),
+    personal_statement: String(formData.get("statement") || "").trim(),
+    portfolio_url: String(formData.get("portfolio") || "").trim(),
+    additional_notes: String(formData.get("notes") || "").trim(),
+    application_confirmation: form.querySelector("#confirmation")?.checked === true
   };
+}
 
-  Object.entries(fieldMap).forEach(([sourceKey, targetId]) => {
-    const target = form.querySelector(`#${targetId}`);
-    if (!target) {
-      return;
-    }
+async function parseApiResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
 
-    if (sourceKey === "program") {
-      target.value = normalizeProgramName(basicData[sourceKey] || "");
-      return;
-    }
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
 
-    target.value = basicData[sourceKey] || "";
+  const text = await response.text();
+  return {
+    ok: response.ok,
+    message: text.trim()
+  };
+}
+
+async function submitSplitApplication(form) {
+  const payload = buildSplitApplicationPayload(form);
+  const endpoint = getApplicationEndpoint();
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
   });
+
+  const result = await parseApiResponse(response);
+  if (!response.ok || !result.ok) {
+    const errors = Array.isArray(result.errors) ? result.errors : [];
+    throw new Error(errors[0] || result.message || "Application submission failed.");
+  }
+
+  return result;
 }
 
 if (basicForm) {
@@ -209,9 +243,11 @@ if (writingForm) {
   } else {
     loadFormData(writingForm, storageKeys.writing);
     enableAutosave(writingForm, storageKeys.writing);
-    void ensureSplitFlowCsrfToken(writingForm).catch(() => {});
+    setApplicationMessage(writingForm, "Your application will be submitted securely on this site.", "info");
 
     writingForm.addEventListener("submit", async (event) => {
+      const submitButton = writingForm.querySelector("button[type='submit']");
+
       if (!writingForm.checkValidity()) {
         event.preventDefault();
         writingForm.reportValidity();
@@ -220,14 +256,29 @@ if (writingForm) {
 
       event.preventDefault();
       saveFormData(writingForm, storageKeys.writing);
+      setApplicationMessage(writingForm, "Submitting your application...", "info");
+
+      if (submitButton) {
+        submitButton.disabled = true;
+      }
 
       try {
-        populateSplitApplicationPayload(writingForm);
-        await ensureSplitFlowCsrfToken(writingForm);
-        writingForm.submit();
+        await submitSplitApplication(writingForm);
+        sessionStorage.removeItem(storageKeys.basic);
+        sessionStorage.removeItem(storageKeys.writing);
+        setApplicationMessage(writingForm, "Application submitted successfully. Redirecting...", "success");
+        window.location.href = "application-success.html";
       } catch (error) {
         console.error(error);
-        window.alert("We could not prepare your application for submission. Please refresh the page and try again.");
+        setApplicationMessage(
+          writingForm,
+          error instanceof Error ? error.message : "We could not submit your application right now.",
+          "error"
+        );
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+        }
       }
     });
   }

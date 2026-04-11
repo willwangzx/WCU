@@ -55,6 +55,8 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 
 ## Deployment
 
-- Deploy the repository root as a static site.
+- For `Cloudflare Pages`, run `npm run build` and publish the `dist/` directory.
+- The static build includes `index.html`, `assets/`, and HTML pages only. Legacy PHP files are excluded from the Cloudflare output.
+- The admissions backend for Oracle VM now lives under `server/`.
+- Set the frontend API origin in `assets/js/site-config.js` before publishing the application form.
 - The main public entry remains `index.html`.
-- All internal page links resolve from the current folder layout.
