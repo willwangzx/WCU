@@ -118,6 +118,7 @@ async function ensureSplitFlowCsrfToken(form) {
   if (!payload.csrf_token) {
     throw new Error("Application security token is missing.");
   }
+  console.log(payload.csrf_token);
 
   tokenField.value = payload.csrf_token;
   return tokenField.value;
@@ -204,30 +205,98 @@ if (basicForm) {
 }
 
 if (writingForm) {
+  // 检查是否已经填写过基本信息
   if (!sessionStorage.getItem(storageKeys.basic)) {
     window.location.href = "apply-basic.html";
   } else {
+    // 加载已保存的写作部分数据
     loadFormData(writingForm, storageKeys.writing);
     enableAutosave(writingForm, storageKeys.writing);
-    void ensureSplitFlowCsrfToken(writingForm).catch(() => {});
+    
+    // 预先填充隐藏字段（从 sessionStorage 读取基本信息）
+    try {
+      populateSplitApplicationPayload(writingForm);
+    } catch (error) {
+      console.error("Failed to populate basic data:", error);
+      alert("无法加载基本信息，请返回上一步重新填写。");
+      window.location.href = "apply-basic.html";
+    }
 
+    // 获取 CSRF token（需要后端支持）
+    ensureSplitFlowCsrfToken(writingForm).catch((err) => {
+      console.error("CSRF token error:", err);
+      alert("无法获取安全令牌，请刷新页面重试。");
+    });
+
+    // 监听表单提交，使用 AJAX
     writingForm.addEventListener("submit", async (event) => {
+      event.preventDefault();  // 完全阻止原生提交
+
+      // 前端验证
       if (!writingForm.checkValidity()) {
-        event.preventDefault();
         writingForm.reportValidity();
         return;
       }
 
-      event.preventDefault();
+      // 保存当前表单数据到 sessionStorage（自动保存功能）
       saveFormData(writingForm, storageKeys.writing);
 
+      // 确保 CSRF token 已经填充（如果没有，再次尝试获取）
+      let csrfToken = writingForm.querySelector("#splitFlowCsrfToken")?.value;
+      console.log(csrfToken);
+      if (!csrfToken) {
+        try {
+          csrfToken = await ensureSplitFlowCsrfToken(writingForm);
+        } catch (err) {
+          alert("无法获取安全令牌，请刷新页面后重试。");
+          return;
+        }
+      }
+
+      // 收集表单数据（包括所有 hidden 字段）
+      const formData = new FormData(writingForm);
+
+      // 禁用提交按钮，防止重复提交
+      const submitBtn = writingForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn?.textContent || "Submit Application";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+      }
+
       try {
-        populateSplitApplicationPayload(writingForm);
-        await ensureSplitFlowCsrfToken(writingForm);
-        writingForm.submit();
+        // 发送 AJAX POST 请求
+        const response = await fetch(writingForm.action, {
+          method: "POST",
+          body: formData,
+          credentials: "same-origin"
+        });
+
+        const result = await response.json();
+        console.log(result);
+
+        if (result.success) {
+          // 成功后清除 sessionStorage 并跳转到成功页面（或显示成功消息后跳转）
+          sessionStorage.removeItem(storageKeys.basic);
+          sessionStorage.removeItem(storageKeys.writing);
+          alert(result.message || "Application submitted successfully!");
+          window.location.href = "application-success.html";  // 或直接跳转到首页
+        } else {
+          // 显示后端返回的错误信息
+          const errors = result.errors ? result.errors.join("\n") : "Submission failed. Please try again.";
+          alert("Error:\n" + errors);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }
+        }
       } catch (error) {
-        console.error(error);
-        window.alert("We could not prepare your application for submission. Please refresh the page and try again.");
+        console.error("AJAX error:", error);
+        alert("Network error. Please check your connection and try again.");
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
       }
     });
   }
