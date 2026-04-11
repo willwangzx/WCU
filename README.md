@@ -58,3 +58,9 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 - Deploy the repository root as a static site.
 - The main public entry remains `index.html`.
 - All internal page links resolve from the current folder layout.
+
+## Testing
+
+- Run local smoke tests with `.\scripts\run-tests.ps1`
+- Start a local preview with `.\scripts\serve-site.ps1`
+- See [`docs/testing-workflow.md`](docs/testing-workflow.md) for the full local and pre-launch testing process
