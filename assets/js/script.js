@@ -311,3 +311,15 @@ if (applicationForm) {
   });
 }
 
+const head = document.querySelector('head');
+const style = getComputedStyle(head);
+const icoUrl = '../assets/favicon.ico';
+
+let link = document.querySelector('link[rel*="icon"]');//新增<link>标签
+if (!link) {
+link = document.createElement('link');
+  link.rel = 'icon';
+  document.head.appendChild(link);
+}
+link.href = icoUrl;
+console.log("add favico succeeded");
