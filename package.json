@@ -1,0 +1,7 @@
+{
+  "name": "wcu-site",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-static.js"
+  }
+}

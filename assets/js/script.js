@@ -5,11 +5,35 @@ const basicForm = document.getElementById("basicInformationForm");
 const writingForm = document.getElementById("writingMaterialsForm");
 const applicationForm = document.getElementById("applicationForm");
 const currentPage = window.location.pathname.split("/").pop();
+const currentScriptSource = document.currentScript?.getAttribute("src") || "";
 const siteConfig = window.WCU_CONFIG || {};
 const storageKeys = {
   basic: "wcuApplicationBasic",
   writing: "wcuApplicationWriting"
 };
+
+function getDefaultFaviconPath() {
+  const normalizedSource = currentScriptSource.trim();
+  if (normalizedSource) {
+    return normalizedSource.replace(/js\/script\.js(?:\?.*)?$/, "favicon.ico");
+  }
+
+  return "assets/favicon.ico";
+}
+
+function ensureSiteFavicon() {
+  const existingIcon = document.querySelector("link[rel='icon'], link[rel='shortcut icon']");
+  if (existingIcon) {
+    return;
+  }
+
+  const faviconLink = document.createElement("link");
+  faviconLink.rel = "icon";
+  faviconLink.href = getDefaultFaviconPath();
+  document.head.appendChild(faviconLink);
+}
+
+ensureSiteFavicon();
 
 window.addEventListener("load", () => {
   if (loadingScreen) {
@@ -52,14 +76,27 @@ if ("IntersectionObserver" in window) {
   document.querySelectorAll(".reveal").forEach((node) => node.classList.add("visible"));
 }
 
-function getApiBaseUrl() {
-  const configured = typeof siteConfig.apiBaseUrl === "string" ? siteConfig.apiBaseUrl.trim() : "";
-  return configured.replace(/\/+$/, "");
+function normalizeApiBaseUrl(value) {
+  return typeof value === "string" ? value.trim().replace(/\/+$/, "") : "";
 }
 
-function getApplicationEndpoint() {
-  const apiBaseUrl = getApiBaseUrl();
-  return apiBaseUrl ? `${apiBaseUrl}/api/application.php` : "/api/application.php";
+function getApiBaseUrl(form) {
+  const formConfigured = normalizeApiBaseUrl(form?.dataset?.apiBase);
+  if (formConfigured) {
+    return formConfigured;
+  }
+
+  return normalizeApiBaseUrl(siteConfig.apiBaseUrl);
+}
+
+function getApplicationEndpoint(form) {
+  const apiBaseUrl = getApiBaseUrl(form);
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/api/application.php`;
+  }
+
+  const formAction = typeof form?.action === "string" ? form.action.trim() : "";
+  return formAction || "/api/application.php";
 }
 
 function getApplicationMessageNode(form) {
@@ -209,7 +246,15 @@ async function parseApiResponse(response) {
   const contentType = response.headers.get("content-type") || "";
 
   if (contentType.includes("application/json")) {
-    return response.json();
+    try {
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to parse JSON response from application endpoint:", error);
+      return {
+        ok: response.ok,
+        message: "The admissions service returned an unreadable response."
+      };
+    }
   }
 
   const text = await response.text();
@@ -221,7 +266,7 @@ async function parseApiResponse(response) {
 
 async function submitSplitApplication(form) {
   const payload = buildSplitApplicationPayload(form);
-  const endpoint = getApplicationEndpoint();
+  const endpoint = getApplicationEndpoint(form);
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {

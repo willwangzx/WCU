@@ -15,12 +15,14 @@ function load_config(): array
             'allowed_origins' => [],
         ],
         'database' => [
+            'driver' => 'mysql',
             'host' => '127.0.0.1',
             'port' => 3306,
             'name' => 'wcu_applications',
             'user' => 'wcu_app',
             'password' => '',
             'charset' => 'utf8mb4',
+            'sqlite_path' => '',
         ],
         'email' => [
             'enabled' => false,
@@ -134,9 +136,59 @@ function read_request_payload(): array
     return is_array($parsed) ? $parsed : [];
 }
 
+function sqlite_schema_exists(PDO $pdo): bool
+{
+    $statement = $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'applications' LIMIT 1");
+    return $statement !== false && $statement->fetchColumn() !== false;
+}
+
+function initialize_sqlite_schema(PDO $pdo): void
+{
+    if (sqlite_schema_exists($pdo)) {
+        return;
+    }
+
+    $schemaPath = dirname(__DIR__) . '/sql/schema.sqlite.sql';
+    if (!is_file($schemaPath)) {
+        throw new RuntimeException('SQLite schema file is missing.');
+    }
+
+    $schema = file_get_contents($schemaPath);
+    if ($schema === false || trim($schema) === '') {
+        throw new RuntimeException('SQLite schema file could not be read.');
+    }
+
+    $pdo->exec($schema);
+}
+
 function get_database_connection(): PDO
 {
     $database = load_config()['database'] ?? [];
+    $driver = strtolower((string) ($database['driver'] ?? 'mysql'));
+
+    if ($driver === 'sqlite') {
+        $sqlitePath = trim((string) ($database['sqlite_path'] ?? ''));
+        if ($sqlitePath === '') {
+            throw new RuntimeException('SQLite database path is not configured.');
+        }
+
+        $directory = dirname($sqlitePath);
+        if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
+            throw new RuntimeException('Unable to create SQLite database directory.');
+        }
+
+        $pdo = new PDO('sqlite:' . $sqlitePath, null, null, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
+        $pdo->exec('PRAGMA foreign_keys = ON');
+        $pdo->exec('PRAGMA journal_mode = WAL');
+        $pdo->exec('PRAGMA busy_timeout = 5000');
+        initialize_sqlite_schema($pdo);
+        return $pdo;
+    }
+
     $dsn = sprintf(
         'mysql:host=%s;port=%d;dbname=%s;charset=%s',
         $database['host'] ?? '127.0.0.1',
@@ -150,4 +202,10 @@ function get_database_connection(): PDO
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
     ]);
+}
+
+function get_database_driver(): string
+{
+    $database = load_config()['database'] ?? [];
+    return strtolower((string) ($database['driver'] ?? 'mysql'));
 }

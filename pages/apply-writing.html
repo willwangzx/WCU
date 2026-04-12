@@ -114,58 +114,7 @@
     </div>
   </footer>
 
-    <script src="../assets/js/script.js?v=20260412-1"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <!--<script>
-  $(document).ready(function() {
-      // 当表单提交时
-      $('#writingMaterialsForm').on('submit', function(e) {
-          e.preventDefault(); // 阻止传统提交
-
-          var $form = $(this);
-          var $submitBtn = $form.find('button[type="submit"]');
-          var originalBtnText = $submitBtn.text();
-
-          // 禁用提交按钮，防止重复提交
-          $submitBtn.prop('disabled', true).text('Submitting...');
-
-          // 收集表单数据（自动包括所有 input, textarea, checkbox）
-          var formData = $form.serialize();
-
-          // 发送 AJAX POST 请求
-          $.ajax({
-              url: $form.attr('action'), // apply.php
-              type: 'POST',
-              data: formData,
-              dataType: 'json',
-              success: function(response) {
-                  if (response.success) {
-                      // 显示成功消息，然后跳转到首页或成功页
-                      alert(response.message);
-                      // 5秒后跳转到首页（可根据需要修改）
-                      setTimeout(function() {
-                          window.location.href = '../index.html';
-                      }, 2000);
-                  } else {
-                      // 显示错误信息
-                      var errorMsg = response.errors ? response.errors.join('\n') : 'Submission failed. Please try again.';
-                      alert('Error:\n' + errorMsg);
-                      $submitBtn.prop('disabled', false).text(originalBtnText);
-                  }
-              },
-              error: function(xhr, status, error) {
-                  // HTTP 错误处理
-                  var errorResponse = xhr.responseJSON;
-                  if (errorResponse && errorResponse.errors) {
-                      alert('Error:\n' + errorResponse.errors.join('\n'));
-                  } else {
-                      alert('Network error. Please check your connection and try again.');
-                  }
-                  $submitBtn.prop('disabled', false).text(originalBtnText);
-              }
-          });
-      });
-  });
-  </script>-->
+  <script src="../assets/js/site-config.js"></script>
+  <script src="../assets/js/script.js?v=20260412-1"></script>
 </body>
 </html>
