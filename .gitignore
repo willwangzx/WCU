@@ -1,0 +1,46 @@
+# Ignore everything by default, then explicitly allow the file types
+# we want to keep under version control.
+*
+!*/
+
+# Keep repository metadata files tracked.
+!.gitignore
+!.gitattributes
+
+# Allowed source, documentation, and config file extensions.
+!*.html
+!*.php
+!*.css
+!*.js
+!*.json
+!*.md
+!*.ps1
+!*.py
+!*.sh
+!*.sql
+!*.conf
+!*.cnf
+!*.example
+!*.ico
+!*.doc
+
+# Generated caches and local build output.
+__pycache__/
+*.py[cod]
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+dist/
+
+# Secrets and machine-local files should never be committed.
+keys/
+*.key
+*.pub
+*.pem
+*.crt
+*.p12
+*.pfx
+server/config.php
+server/config.python.json
+origincertificate.txt
+privatekey.txt

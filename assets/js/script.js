@@ -5,10 +5,35 @@ const basicForm = document.getElementById("basicInformationForm");
 const writingForm = document.getElementById("writingMaterialsForm");
 const applicationForm = document.getElementById("applicationForm");
 const currentPage = window.location.pathname.split("/").pop();
+const currentScriptSource = document.currentScript?.getAttribute("src") || "";
+const siteConfig = window.WCU_CONFIG || {};
 const storageKeys = {
   basic: "wcuApplicationBasic",
   writing: "wcuApplicationWriting"
 };
+
+function getDefaultFaviconPath() {
+  const normalizedSource = currentScriptSource.trim();
+  if (normalizedSource) {
+    return normalizedSource.replace(/js\/script\.js(?:\?.*)?$/, "favicon.ico");
+  }
+
+  return "assets/favicon.ico";
+}
+
+function ensureSiteFavicon() {
+  const existingIcon = document.querySelector("link[rel='icon'], link[rel='shortcut icon']");
+  if (existingIcon) {
+    return;
+  }
+
+  const faviconLink = document.createElement("link");
+  faviconLink.rel = "icon";
+  faviconLink.href = getDefaultFaviconPath();
+  document.head.appendChild(faviconLink);
+}
+
+ensureSiteFavicon();
 
 window.addEventListener("load", () => {
   if (loadingScreen) {
@@ -42,13 +67,74 @@ if ("IntersectionObserver" in window) {
       });
     },
     {
-      threshold: 0.12,
+      threshold: 0.12
     }
   );
 
   document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
 } else {
   document.querySelectorAll(".reveal").forEach((node) => node.classList.add("visible"));
+}
+
+function normalizeApiBaseUrl(value) {
+  return typeof value === "string" ? value.trim().replace(/\/+$/, "") : "";
+}
+
+function getApiBaseUrl(form) {
+  const formConfigured = normalizeApiBaseUrl(form?.dataset?.apiBase);
+  if (formConfigured) {
+    return formConfigured;
+  }
+
+  return normalizeApiBaseUrl(siteConfig.apiBaseUrl);
+}
+
+function getApplicationEndpoint(form) {
+  const apiBaseUrl = getApiBaseUrl(form);
+  if (apiBaseUrl) {
+    return `${apiBaseUrl}/api/application.php`;
+  }
+
+  const formAction = typeof form?.action === "string" ? form.action.trim() : "";
+  return formAction || "/api/application.php";
+}
+
+function getApplicationMessageNode(form) {
+  return form?.querySelector("#applicationMessage") || document.getElementById("applicationMessage");
+}
+
+function setApplicationMessage(form, message, type = "info") {
+  const messageNode = getApplicationMessageNode(form);
+  const normalizedMessage = String(message || "").trim();
+
+  if (!messageNode) {
+    if (normalizedMessage && type === "error") {
+      window.alert(normalizedMessage);
+    }
+    return;
+  }
+
+  messageNode.textContent = normalizedMessage;
+  messageNode.classList.toggle("is-visible", normalizedMessage !== "");
+  messageNode.classList.toggle("error-note", type === "error");
+  messageNode.classList.toggle("success-note", type === "success");
+}
+
+function loadStoredData(storageKey) {
+  const rawValue = sessionStorage.getItem(storageKey);
+
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    const parsedValue = JSON.parse(rawValue);
+    return parsedValue && typeof parsedValue === "object" ? parsedValue : null;
+  } catch (error) {
+    console.error(`Failed to parse saved form data for ${storageKey}:`, error);
+    sessionStorage.removeItem(storageKey);
+    return null;
+  }
 }
 
 function saveFormData(form, storageKey) {
@@ -67,13 +153,11 @@ function saveFormData(form, storageKey) {
 }
 
 function loadFormData(form, storageKey) {
-  const savedValue = sessionStorage.getItem(storageKey);
+  const savedData = loadStoredData(storageKey);
 
-  if (!savedValue) {
+  if (!savedData) {
     return;
   }
-
-  const savedData = JSON.parse(savedValue);
 
   Object.entries(savedData).forEach(([name, value]) => {
     const field = form.elements.namedItem(name);
@@ -96,34 +180,6 @@ function enableAutosave(form, storageKey) {
   form.addEventListener("change", () => saveFormData(form, storageKey));
 }
 
-async function ensureSplitFlowCsrfToken(form) {
-  const tokenField = form.querySelector("#splitFlowCsrfToken");
-  if (!tokenField || tokenField.value) {
-    return tokenField?.value || "";
-  }
-
-  const response = await fetch("apply.php?csrf=1", {
-    credentials: "same-origin",
-    headers: {
-      Accept: "application/json"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error("Unable to load application security token.");
-  }
-
-  const payload = await response.json();
-
-  if (!payload.csrf_token) {
-    throw new Error("Application security token is missing.");
-  }
-  console.log(payload.csrf_token);
-
-  tokenField.value = payload.csrf_token;
-  return tokenField.value;
-}
-
 function normalizeProgramName(program) {
   const map = {
     "School of Mathematics and Computer Science": "School of Mathematics and Computer Science",
@@ -137,19 +193,22 @@ function normalizeProgramName(program) {
   return map[program] || program;
 }
 
-function populateSplitApplicationPayload(form) {
-  const basicValue = sessionStorage.getItem(storageKeys.basic);
+function buildSplitApplicationPayload(form) {
+  const basicData = loadStoredData(storageKeys.basic);
 
-  if (!basicValue) {
-    throw new Error("Basic information is missing.");
+  if (!basicData) {
+    throw new Error("Please complete the basic information step again before submitting.");
   }
 
-  const basicData = JSON.parse(basicValue);
   const requiredBasicKeys = [
     "firstName",
     "lastName",
     "email",
     "phone",
+    "birthMonth",
+    "birthDay",
+    "birthYear",
+    "gender",
     "Nationality",
     "entryTerm",
     "program",
@@ -158,33 +217,72 @@ function populateSplitApplicationPayload(form) {
 
   const missingKey = requiredBasicKeys.find((key) => !String(basicData[key] || "").trim());
   if (missingKey) {
-    throw new Error(`Missing required basic information: ${missingKey}`);
+    throw new Error("Your saved basic information is incomplete. Please review Step 2 and try again.");
   }
 
-  const fieldMap = {
-    firstName: "splitFirstName",
-    lastName: "splitLastName",
-    email: "splitEmail",
-    phone: "splitPhone",
-    Nationality: "splitCitizenship",
-    entryTerm: "splitEntryTerm",
-    program: "splitProgram",
-    schoolName: "splitSchoolName"
+  const formData = new FormData(form);
+
+  return {
+    first_name: String(basicData.firstName || "").trim(),
+    last_name: String(basicData.lastName || "").trim(),
+    email: String(basicData.email || "").trim(),
+    phone: String(basicData.phone || "").trim(),
+    birth_month: String(basicData.birthMonth || "").trim(),
+    birth_day: String(basicData.birthDay || "").trim(),
+    birth_year: String(basicData.birthYear || "").trim(),
+    gender: String(basicData.gender || "").trim(),
+    citizenship: String(basicData.Nationality || "").trim(),
+    entry_term: String(basicData.entryTerm || "").trim(),
+    program: normalizeProgramName(String(basicData.program || "").trim()),
+    school_name: String(basicData.schoolName || "").trim(),
+    personal_statement: String(formData.get("statement") || "").trim(),
+    portfolio_url: String(formData.get("portfolio") || "").trim(),
+    additional_notes: String(formData.get("notes") || "").trim(),
+    application_confirmation: form.querySelector("#confirmation")?.checked === true
   };
+}
 
-  Object.entries(fieldMap).forEach(([sourceKey, targetId]) => {
-    const target = form.querySelector(`#${targetId}`);
-    if (!target) {
-      return;
+async function parseApiResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    try {
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to parse JSON response from application endpoint:", error);
+      return {
+        ok: response.ok,
+        message: "The admissions service returned an unreadable response."
+      };
     }
+  }
 
-    if (sourceKey === "program") {
-      target.value = normalizeProgramName(basicData[sourceKey] || "");
-      return;
-    }
+  const text = await response.text();
+  return {
+    ok: response.ok,
+    message: text.trim()
+  };
+}
 
-    target.value = basicData[sourceKey] || "";
+async function submitSplitApplication(form) {
+  const payload = buildSplitApplicationPayload(form);
+  const endpoint = getApplicationEndpoint(form);
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
   });
+
+  const result = await parseApiResponse(response);
+  if (!response.ok || !result.ok) {
+    const errors = Array.isArray(result.errors) ? result.errors : [];
+    throw new Error(errors[0] || result.message || "Application submission failed.");
+  }
+
+  return result;
 }
 
 if (basicForm) {
@@ -205,97 +303,50 @@ if (basicForm) {
 }
 
 if (writingForm) {
-  // 检查是否已经填写过基本信息
-  if (!sessionStorage.getItem(storageKeys.basic)) {
+  if (!loadStoredData(storageKeys.basic)) {
+    window.alert("Please complete the basic information step before continuing.");
     window.location.href = "apply-basic.html";
   } else {
-    // 加载已保存的写作部分数据
     loadFormData(writingForm, storageKeys.writing);
     enableAutosave(writingForm, storageKeys.writing);
-    
-    // 预先填充隐藏字段（从 sessionStorage 读取基本信息）
-    try {
-      populateSplitApplicationPayload(writingForm);
-    } catch (error) {
-      console.error("Failed to populate basic data:", error);
-      alert("无法加载基本信息，请返回上一步重新填写。");
-      window.location.href = "apply-basic.html";
-    }
+    setApplicationMessage(writingForm, "Your application will be submitted securely on this site.", "info");
 
-    // 获取 CSRF token（需要后端支持）
-    ensureSplitFlowCsrfToken(writingForm).catch((err) => {
-      console.error("CSRF token error:", err);
-      alert("无法获取安全令牌，请刷新页面重试。");
-    });
-
-    // 监听表单提交，使用 AJAX
     writingForm.addEventListener("submit", async (event) => {
-      event.preventDefault();  // 完全阻止原生提交
+      const submitButton = writingForm.querySelector("button[type='submit']");
+      const originalLabel = submitButton?.textContent || "Submit Application";
 
-      // 前端验证
       if (!writingForm.checkValidity()) {
+        event.preventDefault();
         writingForm.reportValidity();
         return;
       }
 
-      // 保存当前表单数据到 sessionStorage（自动保存功能）
+      event.preventDefault();
       saveFormData(writingForm, storageKeys.writing);
+      setApplicationMessage(writingForm, "Submitting your application...", "info");
 
-      // 确保 CSRF token 已经填充（如果没有，再次尝试获取）
-      let csrfToken = writingForm.querySelector("#splitFlowCsrfToken")?.value;
-      console.log(csrfToken);
-      if (!csrfToken) {
-        try {
-          csrfToken = await ensureSplitFlowCsrfToken(writingForm);
-        } catch (err) {
-          alert("无法获取安全令牌，请刷新页面后重试。");
-          return;
-        }
-      }
-
-      // 收集表单数据（包括所有 hidden 字段）
-      const formData = new FormData(writingForm);
-
-      // 禁用提交按钮，防止重复提交
-      const submitBtn = writingForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn?.textContent || "Submit Application";
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Submitting...";
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
       }
 
       try {
-        // 发送 AJAX POST 请求
-        const response = await fetch(writingForm.action, {
-          method: "POST",
-          body: formData,
-          credentials: "same-origin"
-        });
-
-        const result = await response.json();
-        console.log(result);
-
-        if (result.success) {
-          // 成功后清除 sessionStorage 并跳转到成功页面（或显示成功消息后跳转）
-          sessionStorage.removeItem(storageKeys.basic);
-          sessionStorage.removeItem(storageKeys.writing);
-          alert(result.message || "Application submitted successfully!");
-          window.location.href = "application-success.html";  // 或直接跳转到首页
-        } else {
-          // 显示后端返回的错误信息
-          const errors = result.errors ? result.errors.join("\n") : "Submission failed. Please try again.";
-          alert("Error:\n" + errors);
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-          }
-        }
+        await submitSplitApplication(writingForm);
+        sessionStorage.removeItem(storageKeys.basic);
+        sessionStorage.removeItem(storageKeys.writing);
+        setApplicationMessage(writingForm, "Application submitted successfully. Redirecting...", "success");
+        window.location.href = "application-success.html";
       } catch (error) {
-        console.error("AJAX error:", error);
-        alert("Network error. Please check your connection and try again.");
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
+        console.error(error);
+        setApplicationMessage(
+          writingForm,
+          error instanceof Error ? error.message : "We could not submit your application right now.",
+          "error"
+        );
+      } finally {
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = originalLabel;
         }
       }
     });
@@ -310,16 +361,3 @@ if (applicationForm) {
     }
   });
 }
-
-const head = document.querySelector('head');
-const style = getComputedStyle(head);
-const icoUrl = '../assets/favicon.ico';
-
-let link = document.querySelector('link[rel*="icon"]');//新增<link>标签
-if (!link) {
-link = document.createElement('link');
-  link.rel = 'icon';
-  document.head.appendChild(link);
-}
-link.href = icoUrl;
-console.log("add favico succeeded");

@@ -43,6 +43,7 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 - [Go to the White paper](docs/White-Paper.doc)
 - Further management in improving the website and adding new features is tracked in the white paper.
 - [Project Mind Map](docs/mindmap.md)
+- [服务器配置说明](docs/server-configuration.md)
 
 ## Notes
 
@@ -55,6 +56,16 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 
 ## Deployment
 
+- For `Cloudflare Pages`, run `npm run build` and publish the `dist/` directory.
+- The static build includes `index.html`, `assets/`, and HTML pages only. Legacy PHP files are excluded from the Cloudflare output.
+- The admissions backend for Oracle VM now lives under `server/`.
+- Set the frontend API origin in `assets/js/site-config.js` or the writing form `data-api-base` attribute when the site and API are hosted on different origins.
 - Deploy the repository root as a static site.
 - The main public entry remains `index.html`.
 - All internal page links resolve from the current folder layout.
+
+## Testing
+
+- Run local smoke tests with `.\scripts\run-tests.ps1`
+- Start a local preview with `.\scripts\serve-site.ps1`
+- See [`docs/testing-workflow.md`](docs/testing-workflow.md) for the full local and pre-launch testing process
