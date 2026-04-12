@@ -30,6 +30,14 @@ if ($method !== 'POST') {
 }
 
 $application = normalize_application_payload(read_request_payload());
+
+if ($application['honeypot'] !== '') {
+    respond_json(400, [
+        'ok' => false,
+        'errors' => ['Spam detected.'],
+    ]);
+}
+
 $errors = validate_application_payload($application);
 
 if ($errors !== []) {
@@ -45,6 +53,7 @@ try {
 
     respond_json(201, [
         'ok' => true,
+        'message' => 'Application submitted successfully.',
         'application_id' => $applicationId,
         'email_sent' => $emailSent,
     ]);

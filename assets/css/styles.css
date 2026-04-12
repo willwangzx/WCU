@@ -1356,6 +1356,34 @@ section[id] {
   gap: 24px;
 }
 
+.application-message {
+  display: none;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 90, 122, 0.14);
+  background: rgba(15, 90, 122, 0.06);
+  color: #124961;
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+
+.application-message.is-visible {
+  display: block;
+}
+
+.application-message.error-note {
+  border-color: rgba(164, 42, 42, 0.2);
+  background: rgba(164, 42, 42, 0.08);
+  color: #8f1d1d;
+}
+
+.application-message.success-note {
+  border-color: rgba(19, 122, 72, 0.22);
+  background: rgba(19, 122, 72, 0.08);
+  color: #16643d;
+}
+
 .application-lead {
   margin-bottom: 0;
 }

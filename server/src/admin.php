@@ -193,9 +193,15 @@ function build_application_filter_parts(array $filters): array
 {
     $where = [];
     $params = [];
+    $fullNameExpression = get_database_driver() === 'sqlite'
+        ? "(first_name || ' ' || last_name)"
+        : 'CONCAT(first_name, " ", last_name)';
 
     if (($filters['q'] ?? '') !== '') {
-        $where[] = '(first_name LIKE :search OR last_name LIKE :search OR CONCAT(first_name, " ", last_name) LIKE :search OR email LIKE :search OR phone LIKE :search)';
+        $where[] = sprintf(
+            '(first_name LIKE :search OR last_name LIKE :search OR %s LIKE :search OR email LIKE :search OR phone LIKE :search)',
+            $fullNameExpression
+        );
         $params[':search'] = '%' . $filters['q'] . '%';
     }
 
@@ -257,7 +263,7 @@ function fetch_application_by_id(PDO $pdo, int $id): ?array
 
 function delete_application(PDO $pdo, int $id): bool
 {
-    $statement = $pdo->prepare('DELETE FROM applications WHERE id = :id LIMIT 1');
+    $statement = $pdo->prepare('DELETE FROM applications WHERE id = :id');
     $statement->execute([':id' => $id]);
 
     return $statement->rowCount() === 1;

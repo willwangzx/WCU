@@ -4,6 +4,17 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
 
+function first_present_value(array $payload, array $keys, mixed $default = ''): mixed
+{
+    foreach ($keys as $key) {
+        if (array_key_exists($key, $payload)) {
+            return $payload[$key];
+        }
+    }
+
+    return $default;
+}
+
 function text_length(string $value): int
 {
     return function_exists('mb_strlen') ? mb_strlen($value) : strlen($value);
@@ -62,25 +73,26 @@ function get_valid_birth_months(): array
 function normalize_application_payload(array $payload): array
 {
     return [
-        'first_name' => trim((string) ($payload['first_name'] ?? '')),
-        'last_name' => trim((string) ($payload['last_name'] ?? '')),
-        'email' => trim((string) ($payload['email'] ?? '')),
-        'phone' => trim((string) ($payload['phone'] ?? '')),
-        'birth_month' => trim((string) ($payload['birth_month'] ?? '')),
-        'birth_day' => (int) ($payload['birth_day'] ?? 0),
-        'birth_year' => (int) ($payload['birth_year'] ?? 0),
-        'gender' => trim((string) ($payload['gender'] ?? '')),
-        'citizenship' => trim((string) ($payload['citizenship'] ?? '')),
-        'entry_term' => trim((string) ($payload['entry_term'] ?? '')),
-        'program' => trim((string) ($payload['program'] ?? '')),
-        'school_name' => trim((string) ($payload['school_name'] ?? '')),
-        'personal_statement' => trim((string) ($payload['personal_statement'] ?? '')),
-        'portfolio_url' => trim((string) ($payload['portfolio_url'] ?? '')),
-        'additional_notes' => trim((string) ($payload['additional_notes'] ?? '')),
+        'first_name' => trim((string) first_present_value($payload, ['first_name', 'first-name', 'firstName'])),
+        'last_name' => trim((string) first_present_value($payload, ['last_name', 'last-name', 'lastName'])),
+        'email' => trim((string) first_present_value($payload, ['email'])),
+        'phone' => trim((string) first_present_value($payload, ['phone'])),
+        'birth_month' => trim((string) first_present_value($payload, ['birth_month', 'birth-month', 'birthMonth'])),
+        'birth_day' => (int) first_present_value($payload, ['birth_day', 'birth-day', 'birthDay'], 0),
+        'birth_year' => (int) first_present_value($payload, ['birth_year', 'birth-year', 'birthYear'], 0),
+        'gender' => trim((string) first_present_value($payload, ['gender'])),
+        'citizenship' => trim((string) first_present_value($payload, ['citizenship', 'Nationality', 'nationality'])),
+        'entry_term' => trim((string) first_present_value($payload, ['entry_term', 'entry-term', 'entryTerm'])),
+        'program' => trim((string) first_present_value($payload, ['program'])),
+        'school_name' => trim((string) first_present_value($payload, ['school_name', 'school-name', 'schoolName'])),
+        'personal_statement' => trim((string) first_present_value($payload, ['personal_statement', 'personal-statement', 'statement'])),
+        'portfolio_url' => trim((string) first_present_value($payload, ['portfolio_url', 'portfolio-url', 'portfolio'])),
+        'additional_notes' => trim((string) first_present_value($payload, ['additional_notes', 'additional-notes', 'notes'])),
         'application_confirmation' => filter_var(
-            $payload['application_confirmation'] ?? false,
+            first_present_value($payload, ['application_confirmation', 'application-confirmation'], false),
             FILTER_VALIDATE_BOOLEAN
         ),
+        'honeypot' => trim((string) first_present_value($payload, ['website'], '')),
     ];
 }
 
@@ -204,7 +216,7 @@ function insert_application(PDO $pdo, array $application): int
             :ip_address,
             :user_agent,
             :origin_url,
-            NOW()
+            :created_at
         )'
     );
 
@@ -227,6 +239,7 @@ function insert_application(PDO $pdo, array $application): int
         ':ip_address' => $_SERVER['REMOTE_ADDR'] ?? null,
         ':user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
         ':origin_url' => $_SERVER['HTTP_ORIGIN'] ?? null,
+        ':created_at' => (new DateTimeImmutable('now'))->format('Y-m-d H:i:s'),
     ]);
 
     return (int) $pdo->lastInsertId();

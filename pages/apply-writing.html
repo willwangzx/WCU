@@ -56,18 +56,22 @@
           <p>Your progress from the previous page will be saved automatically on this device until you submit.</p>
         </div>
 
-        <form id="writingMaterialsForm" class="application-form" data-application-step="writing" action="apply.php" method="post" novalidate>
-          <input type="hidden" name="split-flow" value="1" />
-          <input type="hidden" name="csrf_token" id="splitFlowCsrfToken" value="" />
+        <form id="writingMaterialsForm" class="application-form" data-application-step="writing" data-api-base="" action="../api/application.php" method="post" novalidate>
           <input type="hidden" name="website" value="" />
           <input type="hidden" name="first-name" id="splitFirstName" value="" />
           <input type="hidden" name="last-name" id="splitLastName" value="" />
           <input type="hidden" name="email" id="splitEmail" value="" />
           <input type="hidden" name="phone" id="splitPhone" value="" />
+          <input type="hidden" name="birth-month" id="splitBirthMonth" value="" />
+          <input type="hidden" name="birth-day" id="splitBirthDay" value="" />
+          <input type="hidden" name="birth-year" id="splitBirthYear" value="" />
+          <input type="hidden" name="gender" id="splitGender" value="" />
           <input type="hidden" name="citizenship" id="splitCitizenship" value="" />
           <input type="hidden" name="entry-term" id="splitEntryTerm" value="" />
           <input type="hidden" name="program" id="splitProgram" value="" />
           <input type="hidden" name="school-name" id="splitSchoolName" value="" />
+
+          <p id="applicationMessage" class="application-message" role="status" aria-live="polite"></p>
 
           <div class="application-form-grid">
             <div class="form-field form-field-full">
@@ -110,7 +114,7 @@
     </div>
   </footer>
 
-    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/script.js?v=20260412-1"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <!--<script>
   $(document).ready(function() {
