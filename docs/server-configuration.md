@@ -75,7 +75,52 @@ WantedBy=multi-user.target
 /etc/systemd/system/wcu-front.service
 ```
 
-### 2.4 前置机部署步骤
+### 2.4 推荐替换为 nginx
+
+当前公网入口已经多次出现“端口仍然可连，但 HTTPS 和 SSH 同时明显卡顿”的情况。根因是前置机直接用 Python 标准库 `http.server + ssl` 暴露公网，这种方式不适合长期承受异常握手、扫描流量和慢连接。
+
+更稳定的做法是：
+
+- 用 `nginx` 直接监听 `80/443`
+- 静态文件仍然从 `/var/www/wcu-site` 提供
+- `/api/` 和 `/admin/` 反向代理到 `161.153.87.137`
+- 停用 `wcu-front.service`
+
+仓库中已经提供前置机专用配置模板：
+
+```text
+server/config/nginx-front-proxy.conf.example
+```
+
+建议最终将该模板部署为：
+
+```text
+/etc/nginx/conf.d/wcu-front.conf
+```
+
+### 2.5 更轻量替代方案：lighttpd + Cloudflare TLS
+
+如果希望极简、压力更小，建议让前置机只跑 HTTP，TLS 交给 Cloudflare（开启橙云代理）。这样前置机只需要 `lighttpd`，不会承担 TLS 握手成本。
+
+仓库中提供了轻量前置配置：
+
+```text
+server/config/lighttpd-front-proxy.conf.example
+```
+
+建议部署到：
+
+```text
+/etc/lighttpd/lighttpd.conf
+```
+
+安装脚本：
+
+```text
+server/scripts/install-front-lighttpd.sh
+```
+
+### 2.6 前置机部署步骤
 
 1. 将静态站点内容同步到 `/var/www/wcu-site`
 2. 将仓库中的 `server/front_proxy.py` 复制到 `/opt/wcu-front/front_proxy.py`
@@ -101,6 +146,61 @@ sudo chmod 644 /opt/wcu-front/certs/wcuedu-origin.crt
 sudo chmod 600 /opt/wcu-front/certs/wcuedu-origin.key
 sudo systemctl daemon-reload
 sudo systemctl enable --now wcu-front
+```
+
+### 2.7 nginx 迁移步骤
+
+如果要把前置机从 Python 入口切到 nginx，建议按下面顺序执行：
+
+1. 安装 nginx
+2. 将 `server/config/nginx-front-proxy.conf.example` 上传到 `/etc/nginx/conf.d/wcu-front.conf`
+3. 执行 `sudo nginx -t`
+4. 如果校验通过，执行 `sudo systemctl enable --now nginx`
+5. 确认 `curl -I http://127.0.0.1/` 和 `curl -k -I https://127.0.0.1/` 正常
+6. 停用 Python 前置服务：`sudo systemctl disable --now wcu-front`
+
+示例命令：
+
+```bash
+sudo dnf install -y nginx
+sudo cp /path/to/nginx-front-proxy.conf.example /etc/nginx/conf.d/wcu-front.conf
+sudo nginx -t
+sudo systemctl enable --now nginx
+curl -I http://127.0.0.1/
+curl -k -I https://127.0.0.1/
+sudo systemctl disable --now wcu-front
+```
+
+切换完成后，再从工作站验证：
+
+```powershell
+curl.exe -I http://137.131.34.58/
+curl.exe -k -I https://137.131.34.58/
+curl.exe -k https://137.131.34.58/api/application.php
+```
+
+### 2.8 lighttpd 迁移步骤（更轻量）
+
+1. 安装 `lighttpd`：`server/scripts/install-front-lighttpd.sh`
+2. 把 `server/config/lighttpd-front-proxy.conf.example` 上传为 `/etc/lighttpd/lighttpd.conf`
+3. 启用服务：`sudo systemctl enable --now lighttpd`
+4. 关闭 Python 前置服务：`sudo systemctl disable --now wcu-front`
+5. 在 Cloudflare 上为域名开启代理（橙云）并启用 HTTPS
+
+示例命令：
+
+```bash
+sudo bash /path/to/install-front-lighttpd.sh
+sudo cp /path/to/lighttpd-front-proxy.conf.example /etc/lighttpd/lighttpd.conf
+sudo systemctl enable --now lighttpd
+sudo systemctl disable --now wcu-front
+```
+
+验证：
+
+```bash
+curl -I http://127.0.0.1/
+curl http://161.153.87.137/api/application.php
 ```
 
 ## 3. 后端应用机配置
@@ -356,3 +456,70 @@ sudo systemctl status wcu-front --no-pager
 - 域名解析和 CDN 配置截图或说明
 - 一键发布脚本
 - 定期备份 SQLite 数据库的流程
+
+## 10. 更轻量的前端替代方案
+
+如果前端机规格较小，且多次出现“TCP 端口仍然可连，但 SSH banner、TLS 握手或 HTTP 响应发不出来”的情况，说明这台机器不适合继续作为公网直接暴露的入口。
+
+按轻量程度推荐如下：
+
+### 10.1 最轻量：Cloudflare Pages 托管静态站
+
+适用场景：
+
+- 前端纯静态
+- 希望基本不让前端 VM 承压
+- 允许把前端和后端分开部署
+
+做法：
+
+- 静态文件发布到 Cloudflare Pages
+- Oracle VM 只保留后端 API
+- 前端把 `apiBaseUrl` 指到独立后端域名，例如 `https://api.wcuedu.net`
+
+### 10.2 次轻量：cloudflared 出站隧道 + 本地静态服务
+
+适用场景：
+
+- 仍想保留前端机
+- 不想让这台机直接暴露 `80/443`
+- 想避免公网扫描流量持续打到小规格 VM
+
+这种方案中，前端机只需要：
+
+- 本地监听 `127.0.0.1:8080`
+- 用一个很轻的静态服务提供页面，例如 `python3 -m http.server`
+- 运行 `cloudflared`
+
+它的优点是：
+
+- 不需要开放 `80/443`
+- 不需要开放公网 `22` 以外的入口
+- Cloudflare 到源站走出站隧道，对小机器更友好
+
+仓库内已提供 cloudflared 配置模板：
+
+```text
+server/config/cloudflared-front.yml.example
+```
+
+模板默认思路是：
+
+- `wcuedu.net` 和 `www.wcuedu.net` 指向本机 `127.0.0.1:8080`
+- `api.wcuedu.net` 直接转发到后端 `161.153.87.137:80`
+
+### 10.3 如果仍然使用 VM 对外开放：优先 nginx，不再使用 Python 直出公网
+
+如果必须让前端机直接对外提供 `80/443`，推荐优先使用：
+
+- `nginx`
+
+而不要继续使用：
+
+- `http.server + ssl`
+- 自制 Python 公网前置代理
+
+原因很简单：
+
+- Python 标准库方案不适合作为长期公网边缘入口
+- 小机器在扫描流量、慢连接和 TLS 握手异常下更容易被拖死
