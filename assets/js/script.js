@@ -180,19 +180,6 @@ function enableAutosave(form, storageKey) {
   form.addEventListener("change", () => saveFormData(form, storageKey));
 }
 
-function normalizeProgramName(program) {
-  const map = {
-    "School of Mathematics and Computer Science": "School of Mathematics and Computer Science",
-    "School of Engineering and Natural Science": "School of Engineering and Natural Science",
-    "School of Business and Management": "School of Business and Management",
-    "School of Art and Literature": "School of Art and Literature",
-    "School of Humanities and Social Science": "School of Humanities and Social Science",
-    "School of Interdisciplinary Studies": "School of Interdisciplinary Studies"
-  };
-
-  return map[program] || program;
-}
-
 function buildSplitApplicationPayload(form) {
   const basicData = loadStoredData(storageKeys.basic);
 
@@ -233,7 +220,7 @@ function buildSplitApplicationPayload(form) {
     gender: String(basicData.gender || "").trim(),
     citizenship: String(basicData.Nationality || "").trim(),
     entry_term: String(basicData.entryTerm || "").trim(),
-    program: normalizeProgramName(String(basicData.program || "").trim()),
+    program: String(basicData.program || "").trim(),
     school_name: String(basicData.schoolName || "").trim(),
     personal_statement: String(formData.get("statement") || "").trim(),
     portfolio_url: String(formData.get("portfolio") || "").trim(),
