@@ -74,6 +74,32 @@ Current local direct-install convention:
 
 The credential file is machine-local and must not be committed.
 
+Production forum deployment uses the current VM rather than a managed
+WordPress host:
+
+- Production WordPress root: `/var/www/wcu-forum`
+- Production forum URL: `https://forum.wcuedu.net/community/`
+- Production database: MySQL database `wcu_forum`
+- Production secret file: `/root/.wcu-forum-prod.env`
+- Production nginx config: `/etc/nginx/sites-available/wcu-forum`
+
+Production deployment artifacts:
+
+- `server/scripts/install-wordpress-forum.sh`
+- `server/scripts/seed-wpforo-forum.php`
+- `server/config/nginx-forum.conf.example`
+
+Run the production installer on the VM as `root` after copying the scripts:
+
+```bash
+bash /root/wcu-forum-install/install-wordpress-forum.sh
+```
+
+The installer is intended to be idempotent. It installs the package stack,
+creates WordPress config from `/root/.wcu-forum-prod.env`, installs wpForo,
+creates the `/community/` page, seeds the forum structure through wpForo APIs,
+writes the forum nginx site, validates nginx, and reloads nginx.
+
 ## Verification Commands
 
 From PowerShell:
@@ -84,6 +110,7 @@ wsl -d Ubuntu-24.04 -- bash -lc "composer --version"
 wsl -d Ubuntu-24.04 -- bash -lc "wp --info | head -n8"
 wsl -d Ubuntu-24.04 -- bash -lc "systemctl is-active apache2; systemctl is-active mysql"
 wsl -d Ubuntu-24.04 -- bash -lc "cd /var/www/wcu-forum && wp core version && wp plugin status wpforo"
+wsl -d Ubuntu-24.04 -- bash -lc "wp --path=/var/www/wcu-forum eval-file /mnt/c/path/to/WCU/server/scripts/seed-wpforo-forum.php"
 curl.exe -I http://localhost:8081/community/
 ```
 
@@ -96,6 +123,8 @@ same way as `localhost`.
 - Admissions backend: `127.0.0.1:8080`.
 - WordPress/wpForo local development: `localhost:8081`.
 - Production HTTP/HTTPS: `80` and `443` behind Cloudflare.
+- Production MySQL: `127.0.0.1:3306` only.
+- Production PHP-FPM: `/run/php/php8.3-fpm.sock`.
 
 ## Updating Requirements
 

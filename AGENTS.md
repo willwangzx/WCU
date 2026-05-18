@@ -72,21 +72,30 @@ or security posture changes.
 - Current production VM public IP: `178.238.234.111`.
 - Previous Oracle VM public IP: `161.153.87.137` (old backend fallback only; do
   not route production traffic there).
-- Public site domains: `wcuedu.net`, `www.wcuedu.net`, `api.wcuedu.net`.
+- Public site domains: `wcuedu.net`, `www.wcuedu.net`, `api.wcuedu.net`,
+  `forum.wcuedu.net`.
 - DNS mode: Cloudflare proxied A records directly to `178.238.234.111`
   (B方案). Cloudflare Tunnel is not part of the current production path.
 - Frontend document root: `/srv/wcu-site`.
 - Backend app directory: `/opt/wcu-backend`.
 - SQLite data directory: `/var/lib/wcu-data`.
 - Backend public paths: `/api` and `/admin`.
+- Production WordPress/wpForo forum root: `/var/www/wcu-forum`.
+- Production WordPress/wpForo forum URL:
+  `https://forum.wcuedu.net/community/`.
+- Production forum database: MySQL database `wcu_forum`.
+- Production forum secrets: `/root/.wcu-forum-prod.env`.
 - Local backend target: `http://127.0.0.1:8080`.
 - Local WordPress/wpForo development target: `http://localhost:8081/community/`
   with files at `/var/www/wcu-forum` inside WSL.
-- Public edge: `nginx` listens on `80` and `443`, serves the static site, and
-  reverse proxies `/api` and `/admin` to `127.0.0.1:8080`.
+- Public edge: `nginx` listens on `80` and `443`, serves the static site,
+  reverse proxies `/api` and `/admin` to `127.0.0.1:8080`, and serves
+  `forum.wcuedu.net` from WordPress via PHP-FPM.
 - Systemd services:
   - `nginx`: active/enabled.
   - `wcu-backend`: active/enabled and running as the dedicated `wcu` user.
+  - `mysql`: active/enabled for the production forum.
+  - `php8.3-fpm`: active/enabled for the production forum.
   - `fail2ban`: active/enabled for SSH.
   - `cloudflared`: removed/not-found under the current DNS A-record setup.
 - Server API key: keep the real value outside git. Use the deployment secret or environment variable named `WCU_SERVER_API_KEY`; do not paste the raw key into this file.
@@ -99,6 +108,8 @@ or security posture changes.
 - The following local files must stay untracked: `keys/`, `server/config.php`, `server/config.python.json`, `origincertificate.txt`, and `privatekey.txt`.
 - Local WordPress development credentials such as `~/.wcu-forum-dev.env`
   must stay outside git.
+- Production WordPress/wpForo credentials in `/root/.wcu-forum-prod.env` must
+  stay outside git.
 - Use `server/config.example.php` and `server/config.python.example.json` as templates only.
 - If a task needs a secret, reference the expected variable or config key instead of writing the secret into source control.
 
@@ -108,6 +119,7 @@ or security posture changes.
   - `wcuedu.net` -> `178.238.234.111`
   - `www.wcuedu.net` -> `178.238.234.111`
   - `api.wcuedu.net` -> `178.238.234.111`
+  - `forum.wcuedu.net` -> `178.238.234.111`
 - Cloudflare SSL/TLS mode should be `Full (strict)`.
 - Nginx has a Cloudflare Origin Certificate installed at:
   - certificate: `/etc/nginx/ssl/wcuedu-origin.crt`
@@ -119,11 +131,13 @@ or security posture changes.
   curl.exe -I https://wcuedu.net/
   curl.exe https://wcuedu.net/api/application.php
   curl.exe -I https://wcuedu.net/admin/
+  curl.exe -I https://forum.wcuedu.net/community/
   ```
 - Expected verification:
   - Homepage: `200 OK`.
   - API: `{"ok": true, "service": "wcu-applications-api"}`.
   - Admin: `401 Unauthorized` until valid Basic Auth credentials are supplied.
+  - Forum: `200 OK` and wpForo markup from WordPress, not static homepage HTML.
 
 ## Security State
 
@@ -142,6 +156,12 @@ Hardening applied on 2026-05-17:
 - `wcu-backend` runs as the dedicated non-root `wcu` service user.
 - Backend CORS only allows `https://wcuedu.net` and `https://www.wcuedu.net`.
 - Nginx sends basic security headers and rate-limits `/admin`.
+- Forum nginx blocks `xmlrpc.php` and rate-limits `wp-login.php`.
+- Forum is public-read; registered subscribers can create topics/replies; guests
+  cannot post. New user posts are moderated and link/attachment access is gated
+  until 3 approved posts.
+- wpForo AI usergroup capabilities are disabled until a real AI service key is
+  intentionally configured outside git.
 - The old `cloudflared` systemd token unit was removed.
 
 Remaining maintenance:
@@ -149,6 +169,8 @@ Remaining maintenance:
 - Schedule a reboot; `/var/run/reboot-required` still existed after hardening.
 - Keep Cloudflare IP allowlists in `ufw` updated if Cloudflare changes its
   published ranges.
+- Configure production WordPress email delivery before relying on password
+  reset or notification emails.
 
 ## Coding Guidelines
 
