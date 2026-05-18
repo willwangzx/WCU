@@ -49,6 +49,8 @@ The main website can continue to live in a separate document root such as `/srv/
 For very small Oracle VMs, you can skip MariaDB entirely and run the backend with SQLite by setting `database.driver` to `sqlite` and pointing `database.sqlite_path` at a writable file such as `/var/lib/wcu-data/wcu.sqlite`. The PHP backend will initialize the SQLite schema from `sql/schema.sqlite.sql` on first start if the database file is empty.
 
 If the VM is too small to install PHP packages reliably, you can also run `python_backend.py` directly with the system Python. It serves the admissions API on `/api/application.php` and a simple password-protected admin panel on `/admin/`.
+The Python admin panel expects a slow `scrypt$...` password hash in
+`config.python.json`; use `scripts/hash-admin-password.py` to generate one.
 
 Historical tunnel deployment: Cloudflare Tunnel can sit directly in front of
 `python_backend.py` and expose the static site, `/api`, and `/admin` together
@@ -68,10 +70,24 @@ For a two-VM split deployment, `front_proxy.py` can sit on the public VM with th
 
 ## Change the admin password
 
-Generate a new password hash:
+Generate a new PHP backend password hash:
 
 ```bash
 php -r "echo password_hash('your-new-password', PASSWORD_DEFAULT), PHP_EOL;"
 ```
 
 Then paste the output into `config.php` under `admin.password_hash` and reload Apache/PHP-FPM if needed.
+
+Generate a new Python backend password hash:
+
+```bash
+python3 scripts/hash-admin-password.py
+```
+
+To migrate an existing Python `sha256$...` hash without knowing the raw
+password, convert the stored hash and paste the output back into
+`config.python.json`:
+
+```bash
+python3 scripts/hash-admin-password.py --from-sha256 'sha256$existing-hex'
+```

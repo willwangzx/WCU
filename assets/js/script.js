@@ -180,6 +180,34 @@ function enableAutosave(form, storageKey) {
   form.addEventListener("change", () => saveFormData(form, storageKey));
 }
 
+function syncSplitHiddenFields(form, basicData) {
+  if (!form || !basicData) {
+    return;
+  }
+
+  const hiddenFieldMap = {
+    splitFirstName: "firstName",
+    splitLastName: "lastName",
+    splitEmail: "email",
+    splitPhone: "phone",
+    splitBirthMonth: "birthMonth",
+    splitBirthDay: "birthDay",
+    splitBirthYear: "birthYear",
+    splitGender: "gender",
+    splitCitizenship: "Nationality",
+    splitEntryTerm: "entryTerm",
+    splitProgram: "program",
+    splitSchoolName: "schoolName"
+  };
+
+  Object.entries(hiddenFieldMap).forEach(([fieldId, storageKeyName]) => {
+    const field = form.querySelector(`#${fieldId}`);
+    if (field) {
+      field.value = String(basicData[storageKeyName] || "").trim();
+    }
+  });
+}
+
 function buildSplitApplicationPayload(form) {
   const basicData = loadStoredData(storageKeys.basic);
 
@@ -207,9 +235,11 @@ function buildSplitApplicationPayload(form) {
     throw new Error("Your saved basic information is incomplete. Please review Step 2 and try again.");
   }
 
+  syncSplitHiddenFields(form, basicData);
   const formData = new FormData(form);
 
   return {
+    website: "",
     first_name: String(basicData.firstName || "").trim(),
     last_name: String(basicData.lastName || "").trim(),
     email: String(basicData.email || "").trim(),
@@ -290,11 +320,14 @@ if (basicForm) {
 }
 
 if (writingForm) {
-  if (!loadStoredData(storageKeys.basic)) {
+  const basicData = loadStoredData(storageKeys.basic);
+
+  if (!basicData) {
     window.alert("Please complete the basic information step before continuing.");
     window.location.href = "apply-basic.html";
   } else {
     loadFormData(writingForm, storageKeys.writing);
+    syncSplitHiddenFields(writingForm, basicData);
     enableAutosave(writingForm, storageKeys.writing);
     setApplicationMessage(writingForm, "Your application will be submitted securely on this site.", "info");
 
@@ -309,6 +342,7 @@ if (writingForm) {
       }
 
       event.preventDefault();
+      syncSplitHiddenFields(writingForm, loadStoredData(storageKeys.basic));
       saveFormData(writingForm, storageKeys.writing);
       setApplicationMessage(writingForm, "Submitting your application...", "info");
 

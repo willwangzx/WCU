@@ -171,6 +171,15 @@ Hardening applied on 2026-05-17:
   intentionally configured outside git.
 - The old `cloudflared` systemd token unit was removed.
 
+Additional admissions hardening applied on 2026-05-18:
+
+- Python admin delete and CSV export actions require stateless CSRF tokens.
+- Python admin password hashes use scrypt formats; legacy SHA-256 hashes should
+  be migrated with `server/scripts/hash-admin-password.py --from-sha256`.
+- Python and PHP admin login attempts are rate-limited.
+- Python API requests reject unsupported content types with `415 Unsupported
+  Media Type`.
+
 Remaining maintenance:
 
 - Schedule a reboot; `/var/run/reboot-required` still existed after hardening.

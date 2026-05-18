@@ -11,6 +11,6 @@
   },
   "admin": {
     "username": "admin",
-    "password_hash": "sha256$replace-with-sha256-hex-of-your-password"
+    "password_hash": "scrypt$32768$8$1$replace-with-salt-hex$replace-with-scrypt-hex"
   }
 }

@@ -245,6 +245,23 @@ function insert_application(PDO $pdo, array $application): int
     return (int) $pdo->lastInsertId();
 }
 
+function sanitize_mail_header_value(string $value): string
+{
+    return trim(str_replace(["\r", "\n"], '', $value));
+}
+
+function format_mailbox_header(string $name, string $address): string
+{
+    $safeName = sanitize_mail_header_value($name);
+    $safeAddress = sanitize_mail_header_value($address);
+
+    if ($safeName === '') {
+        return $safeAddress;
+    }
+
+    return str_replace(['\\', '"'], ['\\\\', '\\"'], $safeName) . ' <' . $safeAddress . '>';
+}
+
 function maybe_send_confirmation_email(array $application): bool
 {
     $email = load_config()['email'] ?? [];
@@ -262,11 +279,22 @@ function maybe_send_confirmation_email(array $application): bool
     $message .= "Best regards,\n";
     $message .= ($email['from_name'] ?? 'WCU Admissions Office');
 
+    $fromName = (string) ($email['from_name'] ?? 'WCU Admissions Office');
+    $fromAddress = sanitize_mail_header_value((string) ($email['from_address'] ?? ''));
+    $adminAddress = sanitize_mail_header_value((string) ($email['admin'] ?? ''));
     $headers = [
-        'From: ' . ($email['from_name'] ?? 'WCU Admissions Office') . ' <' . ($email['from_address'] ?? '') . '>',
-        'Reply-To: ' . ($email['admin'] ?? ''),
         'X-Mailer: PHP/' . phpversion(),
     ];
+
+    if (filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
+        array_unshift($headers, 'From: ' . format_mailbox_header($fromName, $fromAddress));
+    } elseif (filter_var($adminAddress, FILTER_VALIDATE_EMAIL)) {
+        array_unshift($headers, 'From: ' . format_mailbox_header($fromName, $adminAddress));
+    }
+
+    if (filter_var($adminAddress, FILTER_VALIDATE_EMAIL)) {
+        $headers[] = 'Reply-To: ' . $adminAddress;
+    }
 
     return mail($to, $subject, $message, implode("\r\n", $headers));
 }

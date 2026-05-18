@@ -146,6 +146,9 @@ The live backend is the Python deployment path:
 - Entry point: `/opt/wcu-backend/python_backend.py`
 - Local bind: `127.0.0.1:8080`
 - Data store: SQLite at `/var/lib/wcu-data/wcu.sqlite`
+- Admin password hashes use the `scrypt$...` format. Legacy `sha256$...`
+  values can be migrated without knowing the raw password with:
+  `python3 /opt/wcu-backend/scripts/hash-admin-password.py --from-sha256 'sha256$...'`
 
 The admissions backend remains Python plus SQLite. The production forum is a
 separate WordPress/wpForo service using PHP 8.3-FPM and MySQL.
@@ -187,6 +190,11 @@ Hardening applied on 2026-05-17:
   hardening options.
 - Backend CORS allows only `https://wcuedu.net` and
   `https://www.wcuedu.net`.
+- Admissions admin delete and CSV export actions require CSRF tokens.
+- Admissions admin password verification uses scrypt-compatible hashes, and
+  admin login failures are throttled.
+- Admissions API requests with unsupported content types return `415
+  Unsupported Media Type`.
 - Nginx sends HSTS, `X-Content-Type-Options`, `Referrer-Policy`,
   `X-Frame-Options`, and `Permissions-Policy`; `/admin` has basic rate
   limiting.

@@ -16,7 +16,7 @@
     output = output.replace(/\*([^*]+)\*/g, "<em>$1</em>");
     output = output.replace(
       /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-      '<a href="$2" target="_blank" rel="noreferrer">$1</a>'
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
     );
 
     return output;
@@ -84,12 +84,12 @@
         return;
       }
 
-      const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
+      const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
       if (headingMatch) {
         flushParagraph();
         flushList();
         const level = headingMatch[1].length;
-        blocks.push(`<h${level + 1}>${formatInlineMarkdown(headingMatch[2])}</h${level + 1}>`);
+        blocks.push(`<h${level}>${formatInlineMarkdown(headingMatch[2])}</h${level}>`);
         return;
       }
 
