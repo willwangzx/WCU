@@ -290,6 +290,55 @@ function wcu_forum_update_antispam_settings()
     update_option('wpforo_antispam', $antispam);
 }
 
+function wcu_forum_update_recaptcha_settings()
+{
+    $site_key = trim((string) getenv('WCU_FORUM_RECAPTCHA_SITE_KEY'));
+    $secret_key = trim((string) getenv('WCU_FORUM_RECAPTCHA_SECRET_KEY'));
+
+    if ($site_key === '' && $secret_key === '') {
+        return;
+    }
+
+    if ($site_key === '' || $secret_key === '') {
+        fwrite(STDERR, "Skipping forum reCAPTCHA: both WCU_FORUM_RECAPTCHA_SITE_KEY and WCU_FORUM_RECAPTCHA_SECRET_KEY are required.\n");
+        return;
+    }
+
+    $recaptcha = get_option('wpforo_recaptcha', []);
+    if (!is_array($recaptcha)) {
+        $recaptcha = [];
+    }
+
+    $recaptcha['site_key'] = $site_key;
+    $recaptcha['secret_key'] = $secret_key;
+    $recaptcha['theme'] = trim((string) getenv('WCU_FORUM_RECAPTCHA_THEME')) ?: 'light';
+
+    $version = trim((string) getenv('WCU_FORUM_RECAPTCHA_VERSION'));
+    if ($version !== '') {
+        $recaptcha['version'] = $version;
+    }
+
+    $score_threshold = trim((string) getenv('WCU_FORUM_RECAPTCHA_SCORE_THRESHOLD'));
+    if ($score_threshold !== '') {
+        $recaptcha['score_threshold'] = $score_threshold;
+    }
+
+    foreach ([
+        'topic_editor',
+        'post_editor',
+        'wpf_login_form',
+        'wpf_reg_form',
+        'wpf_lostpass_form',
+        'login_form',
+        'reg_form',
+        'lostpass_form',
+    ] as $flag) {
+        $recaptcha[$flag] = 1;
+    }
+
+    update_option('wpforo_recaptcha', $recaptcha);
+}
+
 function wcu_forum_disable_ai_usergroup_permissions()
 {
     if (empty(WPF()->usergroup) || !method_exists(WPF()->usergroup, 'edit')) {
@@ -451,6 +500,7 @@ wcu_forum_seed_topic($created_forums['community-guidelines'], 'Community Guideli
 wcu_forum_seed_topic($created_forums['project-ideas-team-up'], 'How to post a project idea', 'how-to-post-a-project-idea', $project_prompt);
 
 wcu_forum_update_antispam_settings();
+wcu_forum_update_recaptcha_settings();
 wcu_forum_disable_ai_usergroup_permissions();
 
 if (method_exists(WPF()->forum, 'delete_tree_cache')) {

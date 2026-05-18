@@ -34,6 +34,10 @@ commands change.
 - Use `server/config.python.example.json` as the template for local Python
   backend config.
 - Keep real API keys and admin credentials outside git.
+- Leave `window.WCU_CONFIG.recaptchaSiteKey` empty for normal local form
+  testing. To test Google reCAPTCHA, place only the public site key in
+  `assets/js/site-config.js` and set the backend secret with
+  `WCU_RECAPTCHA_SECRET_KEY` or the local untracked backend config.
 - Legacy PHP backend files remain in the repo for reference and overlap checks,
   but production currently uses Python plus SQLite.
 
@@ -102,6 +106,17 @@ values outside git:
 - `WCU_FORUM_SMTP_PASSWORD`
 - `WCU_FORUM_MAIL_FROM` defaults to `noreply@wcuedu.net`
 - `WCU_FORUM_MAIL_FROM_NAME` defaults to `William Chichi University Forum`
+
+Production forum reCAPTCHA is configured through the same untracked env file
+and seeded into wpForo's built-in `wpforo_recaptcha` option. Keep the secret
+outside git:
+
+- `WCU_FORUM_RECAPTCHA_SITE_KEY`
+- `WCU_FORUM_RECAPTCHA_SECRET_KEY`
+- `WCU_FORUM_RECAPTCHA_THEME` defaults to `light`
+- `WCU_FORUM_RECAPTCHA_VERSION` defaults to `v2_checkbox`
+- `WCU_FORUM_RECAPTCHA_SCORE_THRESHOLD` defaults to `0.5` for v3-compatible
+  wpForo versions
 
 Run the production installer on the VM as `root` after copying the scripts:
 

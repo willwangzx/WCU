@@ -102,6 +102,9 @@ or security posture changes.
   - `fail2ban`: active/enabled for SSH.
   - `cloudflared`: removed/not-found under the current DNS A-record setup.
 - Server API key: keep the real value outside git. Use the deployment secret or environment variable named `WCU_SERVER_API_KEY`; do not paste the raw key into this file.
+- Admissions reCAPTCHA secret: keep the real value outside git. Use the
+  environment variable `WCU_RECAPTCHA_SECRET_KEY`; only the public site key may
+  be placed in `assets/js/site-config.js`.
 - Cloudflare Tunnel token: keep the real token outside git. Install it on the server with `sudo cloudflared service install <TUNNEL_TOKEN>`.
 
 ## Security Rules
@@ -116,6 +119,10 @@ or security posture changes.
 - Production forum SMTP values (`WCU_FORUM_SMTP_HOST`,
   `WCU_FORUM_SMTP_USER`, `WCU_FORUM_SMTP_PASSWORD`, and related mail settings)
   must stay outside git.
+- Production forum reCAPTCHA secret `WCU_FORUM_RECAPTCHA_SECRET_KEY` must stay
+  outside git.
+- Production admissions reCAPTCHA secret `WCU_RECAPTCHA_SECRET_KEY` must stay
+  outside git.
 - Use `server/config.example.php` and `server/config.python.example.json` as templates only.
 - If a task needs a secret, reference the expected variable or config key instead of writing the secret into source control.
 
@@ -167,6 +174,9 @@ Hardening applied on 2026-05-17:
   cannot post. New user registration requires email confirmation. New user
   posts are moderated and link/attachment access is gated until 3 approved
   posts.
+- Forum reCAPTCHA is configured through wpForo's built-in `wpforo_recaptcha`
+  option when `WCU_FORUM_RECAPTCHA_SITE_KEY` and
+  `WCU_FORUM_RECAPTCHA_SECRET_KEY` are set in `/root/.wcu-forum-prod.env`.
 - wpForo AI usergroup capabilities are disabled until a real AI service key is
   intentionally configured outside git.
 - The old `cloudflared` systemd token unit was removed.
@@ -179,6 +189,9 @@ Additional admissions hardening applied on 2026-05-18:
 - Python and PHP admin login attempts are rate-limited.
 - Python API requests reject unsupported content types with `415 Unsupported
   Media Type`.
+- Admissions submissions support Google reCAPTCHA verification. The backend
+  rejects submissions without a valid token when `WCU_RECAPTCHA_SECRET_KEY` is
+  set or `recaptcha.enabled` is true in the local backend config.
 
 Remaining maintenance:
 
@@ -187,6 +200,8 @@ Remaining maintenance:
   published ranges.
 - Set valid production `WCU_FORUM_SMTP_*` values and verify one real forum
   registration email before relying on password reset or notification emails.
+- Set valid production `WCU_FORUM_RECAPTCHA_*` values and verify one real forum
+  registration as a logged-out visitor.
 
 ## Coding Guidelines
 

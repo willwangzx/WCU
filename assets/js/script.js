@@ -7,6 +7,8 @@ const applicationForm = document.getElementById("applicationForm");
 const currentPage = window.location.pathname.split("/").pop();
 const currentScriptSource = document.currentScript?.getAttribute("src") || "";
 const siteConfig = window.WCU_CONFIG || {};
+const recaptchaWidgets = new WeakMap();
+let recaptchaLoadPromise = null;
 const storageKeys = {
   basic: "wcuApplicationBasic",
   writing: "wcuApplicationWriting"
@@ -97,6 +99,96 @@ function getApplicationEndpoint(form) {
 
   const formAction = typeof form?.action === "string" ? form.action.trim() : "";
   return formAction || "/api/application.php";
+}
+
+function getRecaptchaSiteKey(form) {
+  const formConfigured = typeof form?.dataset?.recaptchaSiteKey === "string" ? form.dataset.recaptchaSiteKey.trim() : "";
+  if (formConfigured) {
+    return formConfigured;
+  }
+
+  return typeof siteConfig.recaptchaSiteKey === "string" ? siteConfig.recaptchaSiteKey.trim() : "";
+}
+
+function getRecaptchaContainer(form) {
+  return form?.querySelector("#applicationRecaptcha");
+}
+
+function loadRecaptchaApi() {
+  if (window.grecaptcha?.render) {
+    return Promise.resolve(window.grecaptcha);
+  }
+
+  if (recaptchaLoadPromise) {
+    return recaptchaLoadPromise;
+  }
+
+  recaptchaLoadPromise = new Promise((resolve, reject) => {
+    const handleLoad = () => {
+      if (window.grecaptcha?.render) {
+        resolve(window.grecaptcha);
+        return;
+      }
+
+      reject(new Error("reCAPTCHA did not load correctly."));
+    };
+    const handleError = () => reject(new Error("Unable to load reCAPTCHA."));
+    const existingScript = document.querySelector("script[data-wcu-recaptcha='true']");
+
+    if (existingScript) {
+      existingScript.addEventListener("load", handleLoad, { once: true });
+      existingScript.addEventListener("error", handleError, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.dataset.wcuRecaptcha = "true";
+    script.addEventListener("load", handleLoad, { once: true });
+    script.addEventListener("error", handleError, { once: true });
+    document.head.appendChild(script);
+  });
+
+  return recaptchaLoadPromise;
+}
+
+async function initializeApplicationRecaptcha(form) {
+  const siteKey = getRecaptchaSiteKey(form);
+  const container = getRecaptchaContainer(form);
+
+  if (!siteKey || !container) {
+    return;
+  }
+
+  container.classList.add("is-enabled");
+  const grecaptcha = await loadRecaptchaApi();
+
+  if (!recaptchaWidgets.has(form)) {
+    recaptchaWidgets.set(form, grecaptcha.render(container, { sitekey: siteKey }));
+  }
+}
+
+function getApplicationRecaptchaToken(form) {
+  if (!getRecaptchaSiteKey(form)) {
+    return "";
+  }
+
+  const widgetId = recaptchaWidgets.get(form);
+  if (window.grecaptcha?.getResponse && widgetId !== undefined) {
+    return String(window.grecaptcha.getResponse(widgetId) || "").trim();
+  }
+
+  return String(form?.querySelector("textarea[name='g-recaptcha-response']")?.value || "").trim();
+}
+
+function resetApplicationRecaptcha(form) {
+  const widgetId = recaptchaWidgets.get(form);
+
+  if (window.grecaptcha?.reset && widgetId !== undefined) {
+    window.grecaptcha.reset(widgetId);
+  }
 }
 
 function getApplicationMessageNode(form) {
@@ -210,9 +302,13 @@ function syncSplitHiddenFields(form, basicData) {
 
 function buildSplitApplicationPayload(form) {
   const basicData = loadStoredData(storageKeys.basic);
+  const recaptchaToken = getApplicationRecaptchaToken(form);
 
   if (!basicData) {
     throw new Error("Please complete the basic information step again before submitting.");
+  }
+  if (getRecaptchaSiteKey(form) && !recaptchaToken) {
+    throw new Error("Please complete the reCAPTCHA challenge.");
   }
 
   const requiredBasicKeys = [
@@ -255,7 +351,8 @@ function buildSplitApplicationPayload(form) {
     personal_statement: String(formData.get("statement") || "").trim(),
     portfolio_url: String(formData.get("portfolio") || "").trim(),
     additional_notes: String(formData.get("notes") || "").trim(),
-    application_confirmation: form.querySelector("#confirmation")?.checked === true
+    application_confirmation: form.querySelector("#confirmation")?.checked === true,
+    recaptcha_token: recaptchaToken
   };
 }
 
@@ -329,6 +426,10 @@ if (writingForm) {
     loadFormData(writingForm, storageKeys.writing);
     syncSplitHiddenFields(writingForm, basicData);
     enableAutosave(writingForm, storageKeys.writing);
+    initializeApplicationRecaptcha(writingForm).catch((error) => {
+      console.error(error);
+      setApplicationMessage(writingForm, "We could not load reCAPTCHA. Please refresh and try again.", "error");
+    });
     setApplicationMessage(writingForm, "Your application will be submitted securely on this site.", "info");
 
     writingForm.addEventListener("submit", async (event) => {
@@ -359,6 +460,7 @@ if (writingForm) {
         window.location.href = "application-success.html";
       } catch (error) {
         console.error(error);
+        resetApplicationRecaptcha(writingForm);
         setApplicationMessage(
           writingForm,
           error instanceof Error ? error.message : "We could not submit your application right now.",

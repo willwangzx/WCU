@@ -1579,6 +1579,20 @@ section[id] {
   color: var(--muted);
 }
 
+.application-recaptcha {
+  display: none;
+  min-height: 78px;
+  overflow: hidden;
+}
+
+.application-recaptcha.is-enabled {
+  display: block;
+}
+
+.application-recaptcha > div {
+  max-width: 100%;
+}
+
 .form-note {
   margin: 0;
   font-size: 0.9rem;
@@ -1983,6 +1997,17 @@ section[id] {
 @media (max-width: 980px) {
   .application-step-bar {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .application-recaptcha {
+    min-height: 68px;
+  }
+
+  .application-recaptcha > div {
+    transform: scale(0.86);
+    transform-origin: left top;
   }
 }
 

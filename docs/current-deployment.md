@@ -48,11 +48,17 @@ Cloudflare SSL/TLS mode should be `Full (strict)`.
 - Forum theme source in repo: `server/wordpress/themes/wcu-forum/`
 - Forum SMTP MU plugin source in repo:
   `server/wordpress/mu-plugins/wcu-forum-smtp.php`
+- Forum reCAPTCHA settings: wpForo option `wpforo_recaptcha`, seeded from
+  `/root/.wcu-forum-prod.env`
 - Origin certificate: `/etc/nginx/ssl/wcuedu-origin.crt`
 - Origin private key: `/etc/nginx/ssl/wcuedu-origin.key`
 
 Keep `config.python.json`, the SQLite database, SSH keys, forum credentials,
 database dumps, and certificate private keys out of git.
+Keep the admissions reCAPTCHA secret in `WCU_RECAPTCHA_SECRET_KEY`; only the
+public site key belongs in the deployed static `assets/js/site-config.js`.
+Keep the forum reCAPTCHA secret in `/root/.wcu-forum-prod.env` as
+`WCU_FORUM_RECAPTCHA_SECRET_KEY`.
 
 ## Services
 
@@ -152,6 +158,11 @@ The live backend is the Python deployment path:
 
 The admissions backend remains Python plus SQLite. The production forum is a
 separate WordPress/wpForo service using PHP 8.3-FPM and MySQL.
+Admissions reCAPTCHA is optional but fail-closed once configured: set the public
+site key in `assets/js/site-config.js` as `recaptchaSiteKey`, then set
+`WCU_RECAPTCHA_SECRET_KEY` for `wcu-backend`. Optional backend config keys can
+restrict `allowed_hostnames` and, for v3-style tokens, `minimum_score` and
+`expected_action`.
 
 ## Forum Notes
 
@@ -172,6 +183,13 @@ separate WordPress/wpForo service using PHP 8.3-FPM and MySQL.
   `/root/.wcu-forum-prod.env`
 - wpForo is seeded as a hybrid hub for start-here posts, projects,
   academic Q&A, resources, admissions, campus life, and collaboration
+- wpForo's built-in Google reCAPTCHA can be seeded by setting
+  `WCU_FORUM_RECAPTCHA_SITE_KEY` and `WCU_FORUM_RECAPTCHA_SECRET_KEY` in
+  `/root/.wcu-forum-prod.env`, then rerunning
+  `server/scripts/install-wordpress-forum.sh` or the seeder with those
+  environment variables. The seeder enables protection for wpForo login,
+  registration, lost-password, topic/reply editors, and WordPress default auth
+  forms.
 
 ## Security State
 
@@ -195,12 +213,17 @@ Hardening applied on 2026-05-17:
   admin login failures are throttled.
 - Admissions API requests with unsupported content types return `415
   Unsupported Media Type`.
+- Admissions application submissions can require Google reCAPTCHA server-side
+  verification; when `WCU_RECAPTCHA_SECRET_KEY` is set, missing or invalid
+  tokens are rejected before an application is stored.
 - Nginx sends HSTS, `X-Content-Type-Options`, `Referrer-Policy`,
   `X-Frame-Options`, and `Permissions-Policy`; `/admin` has basic rate
   limiting.
 - Forum nginx blocks `xmlrpc.php` and rate-limits `wp-login.php`.
 - Forum permissions allow public reading, subscriber topics/replies, and no
   guest posting. New user registration requires email confirmation.
+- Forum Google reCAPTCHA is available through wpForo's built-in settings and is
+  enabled by the installer when both forum reCAPTCHA keys are present.
 - wpForo spam controls moderate new users, apply flood protection, and block
   links/attachments until the user has at least 3 approved posts.
 - wpForo AI usergroup capabilities are disabled until a real AI service key is
@@ -215,3 +238,5 @@ Remaining maintenance:
   published ranges.
 - Set valid production `WCU_FORUM_SMTP_*` values and verify one real forum
   registration email before relying on password reset or notification emails.
+- Set valid production `WCU_FORUM_RECAPTCHA_*` values and verify one logged-out
+  forum registration flow before relying on forum signup protection.
