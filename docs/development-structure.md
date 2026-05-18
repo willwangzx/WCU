@@ -11,6 +11,7 @@ development areas change.
 |-- index.html                 Static site entry point
 |-- assets/                    Shared frontend assets
 |   |-- css/                   Global styles
+|   |-- img/                   Shared image assets
 |   `-- js/                    Browser JavaScript and site config
 |-- pages/                     Static content pages
 |   `-- schools/               School detail pages
@@ -26,8 +27,10 @@ development areas change.
 
 ## Ownership Boundaries
 
-- Static site work belongs in `index.html`, `pages/`, `assets/css/`, and
-  `assets/js/`.
+- Static site work belongs in `index.html`, `pages/`, `assets/css/`,
+  `assets/img/`, and `assets/js/`.
+- Reusable UI, visual design, homepage section, and asset-use patterns are
+  documented in `docs/ui-design-patterns.md`.
 - Admissions backend work belongs in `server/`. Check both Python and legacy PHP
   paths when behavior overlaps.
 - Deployment and operational changes belong in `docs/current-deployment.md` and
@@ -50,6 +53,7 @@ development areas change.
 - Update `TODO.md` when a new bug is discovered. Remove fixed bugs from
   `TODO.md` and record the fix in `changelog.md`.
 - Update this file when the repository structure or ownership boundaries change.
+- Update `docs/ui-design-patterns.md` when shared visual design patterns change.
 
 ## Local-Only Files
 

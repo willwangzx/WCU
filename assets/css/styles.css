@@ -411,8 +411,8 @@ main {
 
 .forum-stats strong {
   color: #0b3d91;
-  font-size: clamp(1.8rem, 2.6vw, 2.55rem);
-  line-height: 1;
+  font-size: clamp(1.28rem, 1.9vw, 1.75rem);
+  line-height: 1.1;
   white-space: nowrap;
 }
 
@@ -420,6 +420,11 @@ main {
 .forum-topics span {
   color: #677891;
   font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.forum-stats span {
+  text-align: center;
 }
 
 .forum-topics {
@@ -653,6 +658,10 @@ main {
   .forum-stats div {
     justify-items: start;
     padding-left: 0;
+  }
+
+  .forum-stats span {
+    text-align: left;
   }
 
   .site-footer {
