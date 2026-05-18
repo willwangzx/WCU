@@ -88,6 +88,20 @@ Production deployment artifacts:
 - `server/scripts/install-wordpress-forum.sh`
 - `server/scripts/seed-wpforo-forum.php`
 - `server/config/nginx-forum.conf.example`
+- `server/wordpress/themes/wcu-forum/`
+- `server/wordpress/mu-plugins/wcu-forum-smtp.php`
+
+Production forum mail is configured through `/root/.wcu-forum-prod.env` and
+then written by the installer to local `wp-config.php` constants. Keep the real
+values outside git:
+
+- `WCU_FORUM_SMTP_HOST`
+- `WCU_FORUM_SMTP_PORT` defaults to `587`
+- `WCU_FORUM_SMTP_SECURE` defaults to `tls`
+- `WCU_FORUM_SMTP_USER`
+- `WCU_FORUM_SMTP_PASSWORD`
+- `WCU_FORUM_MAIL_FROM` defaults to `noreply@wcuedu.net`
+- `WCU_FORUM_MAIL_FROM_NAME` defaults to `William Chichi University Forum`
 
 Run the production installer on the VM as `root` after copying the scripts:
 
@@ -97,8 +111,10 @@ bash /root/wcu-forum-install/install-wordpress-forum.sh
 
 The installer is intended to be idempotent. It installs the package stack,
 creates WordPress config from `/root/.wcu-forum-prod.env`, installs wpForo,
-creates the `/community/` page, seeds the forum structure through wpForo APIs,
-writes the forum nginx site, validates nginx, and reloads nginx.
+creates the `/community/` page, installs the WCU child theme and SMTP MU
+plugin, enables wpForo email confirmation for registration, seeds the forum
+structure through wpForo APIs, writes the forum nginx site, validates nginx, and
+reloads nginx.
 
 ## Verification Commands
 
@@ -110,6 +126,7 @@ wsl -d Ubuntu-24.04 -- bash -lc "composer --version"
 wsl -d Ubuntu-24.04 -- bash -lc "wp --info | head -n8"
 wsl -d Ubuntu-24.04 -- bash -lc "systemctl is-active apache2; systemctl is-active mysql"
 wsl -d Ubuntu-24.04 -- bash -lc "cd /var/www/wcu-forum && wp core version && wp plugin status wpforo"
+wsl -d Ubuntu-24.04 -- bash -lc "wp --path=/var/www/wcu-forum theme list --allow-root | grep wcu-forum"
 wsl -d Ubuntu-24.04 -- bash -lc "wp --path=/var/www/wcu-forum eval-file /mnt/c/path/to/WCU/server/scripts/seed-wpforo-forum.php"
 curl.exe -I http://localhost:8081/community/
 ```

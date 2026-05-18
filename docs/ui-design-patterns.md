@@ -132,9 +132,15 @@ as compact academic options, not product cards.
 ### Forum Band
 
 The forum band introduces the WordPress/wpForo forum and links to
-`https://forum.wcuedu.net/community/`. Position it as a hybrid community hub for
-student projects, academic Q&A, shared notes, tools, activities, and finding
-collaborators.
+the static `pages/forum.html` entrance page. That page links onward to
+`https://forum.wcuedu.net/community/`. Position it as a hybrid community hub
+for student projects, academic Q&A, shared notes, tools, activities, and
+finding collaborators.
+
+The production WordPress/wpForo forum uses the `server/wordpress/themes/wcu-forum/`
+child theme. Keep its header, footer, type, buttons, forum rows, login form, and
+registration form aligned with the main site tokens above. The theme should load
+late wpForo overrides instead of editing plugin files.
 
 Forum numbers must be real production data or real seeded demo data. Prefer
 non-numeric focus areas over pre-launch counts, and do not invent public

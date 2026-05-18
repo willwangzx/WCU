@@ -179,6 +179,50 @@ function wcu_forum_configure_board()
     ], 0);
 }
 
+function wcu_forum_update_authorization_settings()
+{
+    update_option('users_can_register', 1);
+    update_option('default_role', 'subscriber');
+
+    $authorization = get_option('wpforo_authorization', []);
+    if (!is_array($authorization)) {
+        $authorization = [];
+    }
+
+    $authorization['user_register'] = 1;
+    $authorization['user_register_email_confirm'] = 1;
+    $authorization['manually_approval'] = 0;
+    $authorization['use_our_register_url'] = 0;
+    $authorization['use_our_login_url'] = 0;
+    $authorization['use_our_lostpassword_url'] = 1;
+
+    update_option('wpforo_authorization', $authorization);
+}
+
+function wcu_forum_update_email_settings()
+{
+    $from_email = defined('WCU_FORUM_MAIL_FROM') && WCU_FORUM_MAIL_FROM
+        ? WCU_FORUM_MAIL_FROM
+        : get_option('admin_email');
+    $from_name = defined('WCU_FORUM_MAIL_FROM_NAME') && WCU_FORUM_MAIL_FROM_NAME
+        ? WCU_FORUM_MAIL_FROM_NAME
+        : get_option('blogname') . ' - Forum';
+
+    $email = get_option('wpforo_email', []);
+    if (!is_array($email)) {
+        $email = [];
+    }
+
+    $email['from_name'] = $from_name;
+    $email['from_email'] = $from_email;
+    $email['admin_emails'] = [get_option('admin_email')];
+    $email['overwrite_new_user_notification'] = 1;
+    $email['wp_new_user_notification_email_subject'] = '[blogname] Confirm your forum account';
+    $email['wp_new_user_notification_email_message'] = "Welcome to [blogname].\n\nUsername: [user_login]\n\nTo confirm your email address and set your password, visit:\n\n[set_password_url]\n\nIf you did not request this account, you can ignore this message.";
+
+    update_option('wpforo_email', $email);
+}
+
 function wcu_forum_topic_exists($forumid, $slug)
 {
     return (bool) WPF()->db->get_var(
@@ -280,6 +324,8 @@ function wcu_forum_disable_ai_usergroup_permissions()
 
 wcu_forum_delete_default_if_empty();
 wcu_forum_configure_board();
+wcu_forum_update_authorization_settings();
+wcu_forum_update_email_settings();
 
 $structure = [
     [

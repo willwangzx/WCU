@@ -1,0 +1,316 @@
+:root {
+  --wcu-bg: #f7f8fb;
+  --wcu-surface: #ffffff;
+  --wcu-text: #0b1f3a;
+  --wcu-muted: #44556d;
+  --wcu-line: #d6dde8;
+  --wcu-accent: #1f5dff;
+  --wcu-gold: #b88a2d;
+  --wcu-header-bg: rgba(247, 248, 251, 0.92);
+  --wcu-max: 1180px;
+}
+
+html,
+body.wcu-forum-theme {
+  margin: 0;
+  background: var(--wcu-surface);
+  color: var(--wcu-text);
+  font-family: "Inter", "Segoe UI", sans-serif;
+  letter-spacing: 0;
+}
+
+.wcu-site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  padding: 16px max(24px, calc((100vw - var(--wcu-max)) / 2 + 24px));
+  border-bottom: 1px solid var(--wcu-line);
+  background: var(--wcu-header-bg);
+  backdrop-filter: blur(10px);
+}
+
+.wcu-brand,
+.wcu-site-nav,
+.wcu-footer-links {
+  display: flex;
+  align-items: center;
+}
+
+.wcu-brand {
+  gap: 10px;
+  color: var(--wcu-text);
+  text-decoration: none;
+}
+
+.wcu-brand-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--wcu-text);
+  border-radius: 50%;
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+}
+
+.wcu-brand-text {
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+}
+
+.wcu-site-nav {
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.wcu-site-nav a,
+.wcu-footer-links a {
+  color: var(--wcu-muted);
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.wcu-site-nav a {
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+}
+
+.wcu-site-nav a:hover,
+.wcu-site-nav a.active,
+.wcu-footer-links a:hover {
+  color: var(--wcu-text);
+  border-color: var(--wcu-accent);
+}
+
+.wcu-header-action,
+#wpforo #wpforo-wrap input[type="submit"],
+#wpforo #wpforo-wrap button,
+#wpforo #wpforo-wrap .wpf-button,
+#wpforo #wpforo-wrap .wpf-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 10px 18px;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  background: var(--wcu-accent) !important;
+  color: #ffffff !important;
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none !important;
+  transition: background 0.22s ease, transform 0.18s ease;
+}
+
+.wcu-header-action:hover,
+#wpforo #wpforo-wrap input[type="submit"]:hover,
+#wpforo #wpforo-wrap button:hover,
+#wpforo #wpforo-wrap .wpf-button:hover,
+#wpforo #wpforo-wrap .wpf-button-primary:hover {
+  background: #1548ce !important;
+  transform: translateY(-2px);
+}
+
+.wcu-forum-main {
+  max-width: var(--wcu-max);
+  min-height: 68vh;
+  margin: 0 auto;
+  padding: clamp(30px, 5vw, 56px) 24px;
+}
+
+.wcu-forum-main > .entry-content,
+.wcu-forum-main .wp-block-post-content {
+  margin-block-start: 0;
+}
+
+.wcu-site-footer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  width: min(100% - 48px, var(--wcu-max));
+  margin: 0 auto;
+  padding: 34px 0 42px;
+  border-top: 1px solid var(--wcu-line);
+  color: var(--wcu-muted);
+}
+
+.wcu-footer-title {
+  margin: 0 0 4px;
+  color: var(--wcu-text);
+  font-weight: 700;
+}
+
+.wcu-site-footer p {
+  margin: 0;
+}
+
+.wcu-footer-links {
+  justify-content: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+#wpforo {
+  color: var(--wcu-text);
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+}
+
+#wpforo #wpforo-wrap {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--wcu-text);
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+  font-size: 15px;
+}
+
+#wpforo #wpforo-wrap a {
+  color: #0a47d5;
+}
+
+#wpforo #wpforo-wrap .wpforo-forum-title,
+#wpforo #wpforo-wrap .wpforo-topic-title,
+#wpforo #wpforo-wrap h1,
+#wpforo #wpforo-wrap h2,
+#wpforo #wpforo-wrap h3 {
+  color: #071d43 !important;
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+  letter-spacing: 0;
+}
+
+#wpforo #wpforo-wrap .wpforo-main,
+#wpforo #wpforo-wrap .wpf-head-bar,
+#wpforo #wpforo-wrap .wpf-content,
+#wpforo #wpforo-wrap .wpforo-category,
+#wpforo #wpforo-wrap .wpforo-forum,
+#wpforo #wpforo-wrap .wpforo-topic,
+#wpforo #wpforo-wrap .wpforo-post,
+#wpforo #wpforo-wrap .wpf-table {
+  border-color: var(--wcu-line) !important;
+}
+
+#wpforo #wpforo-wrap .wpforo-category,
+#wpforo #wpforo-wrap .wpf-head-bar {
+  border-radius: 8px 8px 0 0;
+  background: #071d43 !important;
+  color: #ffffff !important;
+}
+
+#wpforo #wpforo-wrap .wpforo-category *,
+#wpforo #wpforo-wrap .wpf-head-bar * {
+  color: #ffffff !important;
+}
+
+#wpforo #wpforo-wrap .wpforo-forum,
+#wpforo #wpforo-wrap .wpforo-topic,
+#wpforo #wpforo-wrap .wpforo-post,
+#wpforo #wpforo-wrap .wpf-field,
+#wpforo #wpforo-wrap .wpforo-login-content,
+#wpforo #wpforo-wrap .wpforo-register-content {
+  background: #ffffff !important;
+}
+
+#wpforo #wpforo-wrap .wpforo-forum:hover,
+#wpforo #wpforo-wrap .wpforo-topic:hover {
+  background: var(--wcu-bg) !important;
+}
+
+#wpforo #wpforo-wrap input[type="text"],
+#wpforo #wpforo-wrap input[type="email"],
+#wpforo #wpforo-wrap input[type="password"],
+#wpforo #wpforo-wrap textarea,
+#wpforo #wpforo-wrap select {
+  border: 1px solid var(--wcu-line) !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: var(--wcu-text) !important;
+  font-family: "Inter", "Segoe UI", sans-serif !important;
+}
+
+#wpforo #wpforo-wrap input:focus,
+#wpforo #wpforo-wrap textarea:focus,
+#wpforo #wpforo-wrap select:focus {
+  border-color: rgba(31, 93, 255, 0.58) !important;
+  box-shadow: 0 0 0 3px rgba(31, 93, 255, 0.14) !important;
+  outline: none !important;
+}
+
+#wpforo #wpforo-wrap .wpfcl-0,
+#wpforo #wpforo-wrap .wpfcl-1,
+#wpforo #wpforo-wrap .wpfcl-2,
+#wpforo #wpforo-wrap .wpfcl-3,
+#wpforo #wpforo-wrap .wpfcl-4,
+#wpforo #wpforo-wrap .wpfcl-5 {
+  color: inherit;
+}
+
+#wpforo #wpforo-wrap .wpforo-register-wrap .wpforo-register-content,
+#wpforo #wpforo-wrap .wpforo-login-wrap .wpforo-login-content {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid var(--wcu-line);
+  border-radius: 8px;
+  box-shadow: 0 18px 38px rgba(7, 29, 67, 0.08);
+}
+
+#wpforo #wpforo-wrap .wpf-reg-info {
+  color: var(--wcu-accent) !important;
+}
+
+@media (max-width: 900px) {
+  .wcu-site-header {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .wcu-site-nav {
+    justify-content: flex-start;
+  }
+
+  .wcu-header-action {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  .wcu-site-header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .wcu-site-nav {
+    gap: 12px;
+  }
+
+  .wcu-site-nav a {
+    font-size: 0.86rem;
+  }
+
+  .wcu-brand-text {
+    max-width: 220px;
+  }
+
+  .wcu-forum-main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .wcu-site-footer {
+    grid-template-columns: 1fr;
+    width: min(100% - 32px, var(--wcu-max));
+  }
+
+  .wcu-footer-links {
+    justify-content: flex-start;
+  }
+}

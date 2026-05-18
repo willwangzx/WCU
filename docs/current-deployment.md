@@ -45,6 +45,9 @@ Cloudflare SSL/TLS mode should be `Full (strict)`.
 - Forum nginx site config: `/etc/nginx/sites-available/wcu-forum`
 - Forum production secrets: `/root/.wcu-forum-prod.env`
 - Forum database: MySQL database `wcu_forum`
+- Forum theme source in repo: `server/wordpress/themes/wcu-forum/`
+- Forum SMTP MU plugin source in repo:
+  `server/wordpress/mu-plugins/wcu-forum-smtp.php`
 - Origin certificate: `/etc/nginx/ssl/wcuedu-origin.crt`
 - Origin private key: `/etc/nginx/ssl/wcuedu-origin.key`
 
@@ -126,6 +129,7 @@ nginx -t
 systemctl is-active nginx php8.3-fpm mysql
 wp --path=/var/www/wcu-forum db check --allow-root
 wp --path=/var/www/wcu-forum plugin status wpforo --allow-root
+wp --path=/var/www/wcu-forum theme list --allow-root | grep wcu-forum
 ```
 
 Expected:
@@ -153,6 +157,13 @@ separate WordPress/wpForo service using PHP 8.3-FPM and MySQL.
 - WordPress root: `/var/www/wcu-forum`
 - WordPress `home` and `siteurl`: `https://forum.wcuedu.net`
 - WordPress registration is enabled with default role `subscriber`
+- wpForo email confirmation is enabled for new registrations; manual account
+  approval is disabled.
+- Forum email is routed through the installer-managed SMTP MU plugin when
+  `WCU_FORUM_SMTP_HOST` and related `WCU_FORUM_SMTP_*` values are set in
+  `/root/.wcu-forum-prod.env`.
+- The active forum theme is the WCU child theme copied from
+  `server/wordpress/themes/wcu-forum/`.
 - Permalinks use `/%postname%/`
 - Initial admin and database credentials are stored only in
   `/root/.wcu-forum-prod.env`
@@ -181,7 +192,7 @@ Hardening applied on 2026-05-17:
   limiting.
 - Forum nginx blocks `xmlrpc.php` and rate-limits `wp-login.php`.
 - Forum permissions allow public reading, subscriber topics/replies, and no
-  guest posting.
+  guest posting. New user registration requires email confirmation.
 - wpForo spam controls moderate new users, apply flood protection, and block
   links/attachments until the user has at least 3 approved posts.
 - wpForo AI usergroup capabilities are disabled until a real AI service key is
@@ -194,5 +205,5 @@ Remaining maintenance:
   hardening.
 - Refresh the Cloudflare IP allowlist in `ufw` if Cloudflare changes its
   published ranges.
-- Configure production WordPress email delivery before relying on password
-  reset or notification emails.
+- Set valid production `WCU_FORUM_SMTP_*` values and verify one real forum
+  registration email before relying on password reset or notification emails.

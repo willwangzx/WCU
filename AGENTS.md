@@ -85,6 +85,9 @@ or security posture changes.
   `https://forum.wcuedu.net/community/`.
 - Production forum database: MySQL database `wcu_forum`.
 - Production forum secrets: `/root/.wcu-forum-prod.env`.
+- Forum theme source: `server/wordpress/themes/wcu-forum/`.
+- Forum SMTP MU plugin source:
+  `server/wordpress/mu-plugins/wcu-forum-smtp.php`.
 - Local backend target: `http://127.0.0.1:8080`.
 - Local WordPress/wpForo development target: `http://localhost:8081/community/`
   with files at `/var/www/wcu-forum` inside WSL.
@@ -110,6 +113,9 @@ or security posture changes.
   must stay outside git.
 - Production WordPress/wpForo credentials in `/root/.wcu-forum-prod.env` must
   stay outside git.
+- Production forum SMTP values (`WCU_FORUM_SMTP_HOST`,
+  `WCU_FORUM_SMTP_USER`, `WCU_FORUM_SMTP_PASSWORD`, and related mail settings)
+  must stay outside git.
 - Use `server/config.example.php` and `server/config.python.example.json` as templates only.
 - If a task needs a secret, reference the expected variable or config key instead of writing the secret into source control.
 
@@ -158,8 +164,9 @@ Hardening applied on 2026-05-17:
 - Nginx sends basic security headers and rate-limits `/admin`.
 - Forum nginx blocks `xmlrpc.php` and rate-limits `wp-login.php`.
 - Forum is public-read; registered subscribers can create topics/replies; guests
-  cannot post. New user posts are moderated and link/attachment access is gated
-  until 3 approved posts.
+  cannot post. New user registration requires email confirmation. New user
+  posts are moderated and link/attachment access is gated until 3 approved
+  posts.
 - wpForo AI usergroup capabilities are disabled until a real AI service key is
   intentionally configured outside git.
 - The old `cloudflared` systemd token unit was removed.
@@ -169,8 +176,8 @@ Remaining maintenance:
 - Schedule a reboot; `/var/run/reboot-required` still existed after hardening.
 - Keep Cloudflare IP allowlists in `ufw` updated if Cloudflare changes its
   published ranges.
-- Configure production WordPress email delivery before relying on password
-  reset or notification emails.
+- Set valid production `WCU_FORUM_SMTP_*` values and verify one real forum
+  registration email before relying on password reset or notification emails.
 
 ## Coding Guidelines
 

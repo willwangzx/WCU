@@ -16,6 +16,7 @@ development areas change.
 |-- pages/                     Static content pages
 |   `-- schools/               School detail pages
 |-- server/                    Admissions backend plus deployment/config assets
+|   `-- wordpress/             Forum WordPress theme and MU plugin sources
 |-- scripts/                   Local build, preview, and smoke-test scripts
 |-- tests/                     Test fixtures and checks
 |-- docs/                      Team docs, deployment notes, and planning docs
@@ -33,9 +34,9 @@ development areas change.
   documented in `docs/ui-design-patterns.md`.
 - Admissions backend work belongs in `server/`. Check both Python and legacy PHP
   paths when behavior overlaps.
-- Forum deployment artifacts live in `server/scripts/` and `server/config/`.
-  The production WordPress/wpForo files themselves live outside the repository
-  at `/var/www/wcu-forum`.
+- Forum deployment artifacts live in `server/scripts/`, `server/config/`, and
+  `server/wordpress/`. The production WordPress/wpForo files themselves live
+  outside the repository at `/var/www/wcu-forum`.
 - Deployment and operational changes belong in `docs/current-deployment.md` and
   `AGENTS.md`.
 - Historical deployment notes stay in `docs/cloudflare-tunnel-deployment.md`,
