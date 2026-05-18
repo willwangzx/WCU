@@ -1,0 +1,16 @@
+{
+  "cors": {
+    "allowed_origins": [
+      "https://wcuedu.net",
+      "https://www.wcuedu.net",
+      "http://137.131.34.58"
+    ]
+  },
+  "database": {
+    "path": "/var/lib/wcu-data/wcu.sqlite"
+  },
+  "admin": {
+    "username": "admin",
+    "password_hash": "sha256$replace-with-sha256-hex-of-your-password"
+  }
+}

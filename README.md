@@ -43,6 +43,9 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 - [Go to the White paper](docs/White-Paper.doc)
 - Further management in improving the website and adding new features is tracked in the white paper.
 - [Project Mind Map](docs/mindmap.md)
+- [Current Production Deployment](docs/current-deployment.md)
+- [服务器配置说明](docs/server-configuration.md)
+- [Cloudflare Tunnel 部署说明（历史/备用）](docs/cloudflare-tunnel-deployment.md)
 
 ## Notes
 
@@ -55,6 +58,19 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 
 ## Deployment
 
+- For static build output, run `npm run build`; the generated `dist/` directory is not committed.
+- Current production runs on `178.238.234.111` with Cloudflare proxied A
+  records, nginx on `80/443`, and the Python backend on `127.0.0.1:8080`; see
+  [`docs/current-deployment.md`](docs/current-deployment.md).
+- The static build includes `index.html`, `assets/`, and HTML pages only. Legacy PHP files are excluded from the Cloudflare output.
+- The admissions backend for Oracle VM now lives under `server/`.
+- Set the frontend API origin in `assets/js/site-config.js` or the writing form `data-api-base` attribute when the site and API are hosted on different origins.
 - Deploy the repository root as a static site.
 - The main public entry remains `index.html`.
 - All internal page links resolve from the current folder layout.
+
+## Testing
+
+- Run local smoke tests with `.\scripts\run-tests.ps1`
+- Start a local preview with `.\scripts\serve-site.ps1`
+- See [`docs/testing-workflow.md`](docs/testing-workflow.md) for the full local and pre-launch testing process

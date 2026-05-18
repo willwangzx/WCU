@@ -1,0 +1,46 @@
+Listen 443 https
+
+<VirtualHost *:80>
+    ServerName wcuedu.net
+    ServerAlias www.wcuedu.net 129.146.182.6
+    Redirect permanent / https://wcuedu.net/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName wcuedu.net
+    ServerAlias www.wcuedu.net 129.146.182.6
+    ServerAdmin webmaster@example.com
+    DocumentRoot /srv/wcu-site
+
+    SSLEngine on
+    SSLCertificateFile /etc/pki/tls/certs/wcuedu-origin.crt
+    SSLCertificateKeyFile /etc/pki/tls/private/wcuedu-origin.key
+
+    ErrorLog /var/log/httpd/wcu-api-error.log
+    CustomLog /var/log/httpd/wcu-api-access.log combined
+
+    <Directory /srv/wcu-site>
+        AllowOverride None
+        Require all granted
+        DirectoryIndex index.html
+    </Directory>
+
+    Alias /api /srv/wcu-api/public/api
+
+    <Directory /srv/wcu-api/public/api>
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    Alias /admin /srv/wcu-api/public/admin
+
+    <Directory /srv/wcu-api/public/admin>
+        AllowOverride None
+        Require all granted
+        DirectoryIndex index.php
+    </Directory>
+
+    <FilesMatch \.php$>
+        SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost/"
+    </FilesMatch>
+</VirtualHost>

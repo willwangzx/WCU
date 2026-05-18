@@ -1,0 +1,20 @@
+[mysqld]
+# Keep MariaDB comfortable on a 2 GB Oracle Free Tier VM.
+bind-address = 127.0.0.1
+max_connections = 25
+thread_cache_size = 8
+table_open_cache = 128
+tmp_table_size = 16M
+max_heap_table_size = 16M
+sort_buffer_size = 1M
+join_buffer_size = 1M
+read_buffer_size = 256K
+read_rnd_buffer_size = 512K
+key_buffer_size = 32M
+innodb_buffer_pool_size = 128M
+innodb_log_buffer_size = 16M
+innodb_flush_method = O_DIRECT
+performance_schema = OFF
+
+[client]
+default-character-set = utf8mb4
