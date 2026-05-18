@@ -7,7 +7,10 @@ import hashlib
 import html
 import io
 import json
+import mimetypes
+import os
 import sqlite3
+import sys
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -17,6 +20,9 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = BASE_DIR / "config.python.json"
+SERVER_HOST = os.environ.get("WCU_BIND_HOST", "0.0.0.0")
+SERVER_PORT = int(os.environ.get("WCU_BIND_PORT", "80"))
+STATIC_ROOT = Path(os.environ.get("WCU_STATIC_ROOT", "/srv/wcu-site")).resolve()
 DEFAULT_CONFIG = {
     "cors": {"allowed_origins": []},
     "database": {"path": "/var/lib/wcu-data/wcu.sqlite"},
@@ -243,12 +249,15 @@ class Handler(BaseHTTPRequestHandler):
             return False
         return True
 
-    def send_json(self, status: HTTPStatus, payload: dict) -> None:
+    def send_json(self, status: HTTPStatus, payload: dict, head_only: bool = False) -> None:
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.write_cors()
         self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+        if not head_only:
+            self.wfile.write(body)
 
     def do_OPTIONS(self) -> None:
         self.send_response(HTTPStatus.NO_CONTENT)
@@ -267,6 +276,8 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/admin/export.csv":
             if self.require_admin():
                 self.export_csv(parsed)
+            return
+        if self.serve_static(parsed.path):
             return
         self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -291,6 +302,70 @@ class Handler(BaseHTTPRequestHandler):
                 self.end_headers()
             return
         self.send_error(HTTPStatus.NOT_FOUND)
+
+    def do_HEAD(self) -> None:
+        parsed = urlparse(self.path)
+        if parsed.path == "/api/application.php":
+            self.send_json(HTTPStatus.OK, {"ok": True, "service": "wcu-applications-api"}, head_only=True)
+            return
+        if parsed.path in {"/admin", "/admin/"}:
+            if self.require_admin():
+                self.send_response(HTTPStatus.OK)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.end_headers()
+            return
+        if parsed.path == "/admin/export.csv":
+            if self.require_admin():
+                self.send_response(HTTPStatus.OK)
+                self.send_header("Content-Type", "text/csv; charset=utf-8")
+                self.end_headers()
+            return
+        if self.serve_static(parsed.path, head_only=True):
+            return
+        self.send_error(HTTPStatus.NOT_FOUND)
+
+    def static_path_for(self, request_path: str) -> Path | None:
+        normalized = request_path or "/"
+        if normalized.startswith(("/api", "/admin")):
+            return None
+
+        relative = normalized.lstrip("/")
+        target = STATIC_ROOT / relative if relative else STATIC_ROOT
+
+        if normalized.endswith("/"):
+            target = target / "index.html"
+        elif target.is_dir():
+            target = target / "index.html"
+
+        if not target.exists() and "." not in Path(relative).name and relative:
+            html_target = STATIC_ROOT / f"{relative}.html"
+            if html_target.exists():
+                target = html_target
+
+        try:
+            resolved = target.resolve()
+        except FileNotFoundError:
+            resolved = target
+
+        if STATIC_ROOT not in resolved.parents and resolved != STATIC_ROOT:
+            return None
+        return resolved
+
+    def serve_static(self, request_path: str, head_only: bool = False) -> bool:
+        target = self.static_path_for(request_path)
+        if target is None or not target.is_file():
+            return False
+
+        content_type = mimetypes.guess_type(str(target))[0] or "application/octet-stream"
+        payload = target.read_bytes()
+
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        if not head_only:
+            self.wfile.write(payload)
+        return True
 
     def handle_api_post(self) -> None:
         if not self.allowed_origin():
@@ -388,10 +463,20 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(payload)
 
 
+class WCUHTTPServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address) -> None:  # type: ignore[override]
+        _, exc, _ = sys.exc_info()
+        if isinstance(exc, (BrokenPipeError, ConnectionResetError, TimeoutError)):
+            return
+        super().handle_error(request, client_address)
+
+
 def main() -> None:
     ensure_schema()
-    server = ThreadingHTTPServer(("0.0.0.0", 80), Handler)
-    print("WCU backend listening on :80", flush=True)
+    server = WCUHTTPServer((SERVER_HOST, SERVER_PORT), Handler)
+    print(f"WCU backend listening on {SERVER_HOST}:{SERVER_PORT}", flush=True)
     server.serve_forever()
 
 

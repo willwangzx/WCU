@@ -1,8 +1,17 @@
 # WCU 服务器配置说明
 
-更新时间：2026-04-12
+更新时间：2026-05-17
 
-这份文档用于说明 WCU 当前的双机部署结构、关键路径、启动方式、证书位置、验证命令和常见故障排查方法。内容以当前仓库配置和 2026-04-12 的线上核查结果为准。
+> 当前生产环境已经迁移到新服务器 `178.238.234.111`，并采用 Cloudflare
+> proxied A 记录直连源站的 B 方案。`nginx` 对外监听 `80/443`，静态站点位于
+> `/srv/wcu-site`，`/api` 和 `/admin` 反向代理到本机
+> `127.0.0.1:8080` 的 `wcu-backend.service`。`cloudflared` 已停用。
+> 当前状态请优先参考 [`current-deployment.md`](current-deployment.md)。
+
+这份文档主要记录历史上的双机部署结构、关键路径、启动方式、证书位置、验证命令和常见故障排查方法。
+
+如果你需要回看旧的 Cloudflare Tunnel 方案，请参考
+[Cloudflare Tunnel 部署说明](cloudflare-tunnel-deployment.md)。该方案已经不是当前生产路径。
 
 ## 1. 当前部署拓扑
 

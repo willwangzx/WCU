@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import http.client
 import os
+import socket
 import ssl
 import threading
 from functools import partial
@@ -28,6 +29,33 @@ HOP_BY_HOP_HEADERS = {
     "transfer-encoding",
     "upgrade",
 }
+
+
+class TLSThreadingHTTPServer(ThreadingHTTPServer):
+    daemon_threads = True
+    request_queue_size = 128
+
+    def __init__(self, server_address, RequestHandlerClass, ssl_context: ssl.SSLContext):
+        self.ssl_context = ssl_context
+        super().__init__(server_address, RequestHandlerClass)
+
+    def process_request_thread(self, request, client_address):
+        try:
+            tls_request = self.ssl_context.wrap_socket(
+                request,
+                server_side=True,
+                do_handshake_on_connect=False,
+            )
+            tls_request.settimeout(15)
+            tls_request.do_handshake()
+        except (socket.timeout, TimeoutError, ssl.SSLError, OSError):
+            try:
+                request.close()
+            except OSError:
+                pass
+            return
+
+        super().process_request_thread(tls_request, client_address)
 
 
 class FrontProxyHandler(SimpleHTTPRequestHandler):
@@ -160,10 +188,9 @@ def serve_http_redirect() -> None:
 
 def serve_https_front() -> None:
     handler = partial(FrontProxyHandler, directory=str(STATIC_ROOT))
-    server = ThreadingHTTPServer(("0.0.0.0", 443), handler)
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(TLS_CERT, TLS_KEY)
-    server.socket = context.wrap_socket(server.socket, server_side=True)
+    server = TLSThreadingHTTPServer(("0.0.0.0", 443), handler, context)
     server.serve_forever()
 
 
