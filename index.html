@@ -1,14 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>William Chichi University | Way Beyond Exams</title>
-  <meta name="description" content="Official website concept for William Chichi University." />
+  <meta name="description" content="William Chichi University is a project-based university for students who learn by building what matters." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
@@ -32,94 +31,153 @@
       <a href="pages/admissions.html">Admissions</a>
       <a href="pages/research.html">Research</a>
       <a href="pages/news.html">News</a>
+      <a href="#forum">Forum</a>
     </nav>
-    <a class="btn btn-outline" href="pages/apply.html">Apply Now</a>
+    <a class="btn btn-solid" href="pages/apply.html">Apply Now</a>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="hero-overlay"></div>
-      <div class="hero-content reveal">
-        <p class="eyebrow">Official Website</p>
-        <div class="hero-mark" aria-hidden="true">W</div>
-        <h1>Way Beyond Exams</h1>
-        <p class="hero-subtitle">William Chichi University</p>
-        <p class="hero-copy">A modern island university for students who build, research, and imagine beyond standardized metrics.</p>
-        <div class="hero-actions">
-          <a class="btn btn-solid" href="pages/about.html">Explore WCU</a>
-          <a class="btn btn-outline" href="pages/admissions.html">Admissions</a>
+  <main class="home-main">
+    <section class="home-hero" aria-labelledby="homeHeroTitle">
+      <div class="home-hero-media" aria-hidden="true"></div>
+      <div class="home-hero-content">
+        <h1 id="homeHeroTitle">William Chichi University</h1>
+        <p class="home-hero-line">Way Beyond Exams</p>
+        <p class="home-hero-copy">Learn by building what matters. WCU connects project-based academics, admissions, research, and student community into one living campus system.</p>
+        <div class="home-actions" aria-label="Primary actions">
+          <a class="btn btn-solid" href="pages/academics.html">Explore Academics</a>
+          <a class="btn btn-outline" href="pages/apply.html">Apply Now</a>
+          <a class="home-text-action" href="#forum">Student Forum</a>
         </div>
       </div>
     </section>
 
-    <section class="section reveal">
-      <div class="section-header">
-        <p class="eyebrow">Core Philosophy</p>
-        <h2>Beyond scores, toward real intelligence.</h2>
+    <section class="home-philosophy" aria-labelledby="philosophyTitle">
+      <div class="home-section-title">
+        <h2 id="philosophyTitle">Our core philosophy</h2>
+        <p>Education should ignite purpose, build capability, and create impact.</p>
       </div>
-      <div class="pillars">
+      <div class="principle-row" aria-label="WCU principles">
         <article>
-          <h3>Beyond Exams</h3>
-          <p>We reject exam-centered education and prioritize originality, resilience, and independent thought.</p>
+          <span class="principle-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v18M7 8a5 5 0 0 1 10 0c0 4-5 4-5 8" /></svg>
+          </span>
+          <h3>Purpose-Driven</h3>
+          <p>Students discover meaningful work through evidence, practice, and reflection.</p>
         </article>
         <article>
-          <h3>Technology & Truth</h3>
-          <p>From core science to frontier AI, every discipline is grounded in evidence, ethics, and utility.</p>
+          <span class="principle-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 19 19 5M8 5h11v11" /></svg>
+          </span>
+          <h3>Build & Create</h3>
+          <p>Every program turns ideas into projects, ventures, research, or systems.</p>
         </article>
         <article>
-          <h3>Global Vision</h3>
-          <p>Built for cross-cultural collaboration, WCU prepares students for global complexity.</p>
+          <span class="principle-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm10 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM3 21a6 6 0 0 1 8 0m2 0a6 6 0 0 1 8 0" /></svg>
+          </span>
+          <h3>Community First</h3>
+          <p>Learning grows faster when students ask, answer, mentor, and share.</p>
+        </article>
+        <article>
+          <span class="principle-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 0c2.5 2.4 3.8 5.4 3.8 9S14.5 18.6 12 21m0-18C9.5 5.4 8.2 8.4 8.2 12S9.5 18.6 12 21M3.8 12h16.4" /></svg>
+          </span>
+          <h3>Impact Focused</h3>
+          <p>Students pursue knowledge that improves lives and strengthens society.</p>
         </article>
       </div>
     </section>
 
-    <section class="section reveal">
-      <div class="section-header">
-        <p class="eyebrow">Academics</p>
-        <h2>Schools and interdisciplinary tracks.</h2>
+    <section class="program-rail" aria-labelledby="programTitle">
+      <div class="program-lead">
+        <h2 id="programTitle">Explore academics</h2>
+        <p>Choose a school. Discover your path. Design your future.</p>
+        <a href="pages/academics.html">View all programs</a>
       </div>
-      <div class="card-grid">
-        <a class="card" href="pages/academics.html">
-          <h3>Computer Science</h3>
-          <p>Systems, algorithms, security, and software architecture.</p>
+      <div class="program-list">
+        <a href="pages/schools/school-mathematics-and-computer-science.html">
+          <span>01</span>
+          <strong>Computing & AI</strong>
+          <small>Build intelligent systems and responsible software.</small>
         </a>
-        <a class="card" href="pages/academics.html">
-          <h3>Artificial Intelligence</h3>
-          <p>Machine intelligence, model safety, and human-centered AI.</p>
+        <a href="pages/schools/school-engineering-and-natural-science.html">
+          <span>02</span>
+          <strong>Engineering</strong>
+          <small>Design, build, and test real-world solutions.</small>
         </a>
-        <a class="card" href="pages/academics.html">
-          <h3>Interdisciplinary Studies</h3>
-          <p>Mix engineering, design, policy, and entrepreneurship.</p>
+        <a href="pages/schools/school-business-and-management.html">
+          <span>03</span>
+          <strong>Business</strong>
+          <small>Lead responsibly and create sustainable ventures.</small>
         </a>
-        <a class="card" href="pages/academics.html">
-          <h3>Innovation Lab</h3>
-          <p>Project studios where concepts become real-world systems.</p>
+        <a href="pages/schools/school-art-and-literature.html">
+          <span>04</span>
+          <strong>Arts & Social Sciences</strong>
+          <small>Understand people, culture, language, and change.</small>
         </a>
       </div>
     </section>
 
-    <section class="section campus-band reveal">
-      <div>
-        <p class="eyebrow">Campus</p>
-        <h2>Island setting. Villa-style spaces. Minimal architecture.</h2>
-        <p>WCU is designed as a living laboratory: ocean-facing classrooms, open labs, and residences that foster focus and creativity.</p>
-        <a class="text-link" href="pages/campus.html">View Campus Details</a>
+    <section class="forum-band" id="forum" aria-labelledby="forumTitle">
+      <div class="forum-copy">
+        <h2 id="forumTitle">Student Forum</h2>
+        <p>Connect, ask, share, and grow with future students, current students, alumni, and mentors.</p>
+        <a class="btn btn-outline" href="#forum">Join the Forum</a>
       </div>
-      <div class="campus-visual" aria-hidden="true">
-        <div class="blob"></div>
-        <div class="line-grid"></div>
+      <div class="forum-stats" aria-label="Forum activity">
+        <div><strong>12K+</strong><span>Members</span></div>
+        <div><strong>850+</strong><span>Discussions</span></div>
+        <div><strong>120+</strong><span>Mentors</span></div>
+      </div>
+      <div class="forum-topics" aria-label="Recent forum questions">
+        <a href="#forum">
+          <strong>How is the AI program hands-on?</strong>
+          <span>Computing & AI</span>
+        </a>
+        <a href="#forum">
+          <strong>Scholarship options for international students</strong>
+          <span>Admissions</span>
+        </a>
+        <a href="#forum">
+          <strong>What student projects are making impact?</strong>
+          <span>Campus Life</span>
+        </a>
       </div>
     </section>
 
-    <section class="section reveal">
-      <div class="section-header">
-        <p class="eyebrow">News</p>
-        <h2>Latest updates</h2>
+    <section class="admissions-path" aria-labelledby="admissionsTitle">
+      <div class="admissions-path-title">
+        <h2 id="admissionsTitle">Admissions</h2>
+        <p>Your journey starts here.</p>
       </div>
-      <div class="news-list">
-        <a href="pages/news.html"><span>Mar 28, 2026</span> WCU opens Oceanic AI Systems Lab</a>
-        <a href="pages/news.html"><span>Mar 10, 2026</span> New project-based core curriculum announced</a>
-        <a href="pages/news.html"><span>Feb 21, 2026</span> Global Research Fellowship applications now open</a>
+      <ol class="admissions-steps">
+        <li><span>1</span><strong>Explore Programs</strong><small>Find the right path.</small></li>
+        <li><span>2</span><strong>Check Requirements</strong><small>Understand entry standards.</small></li>
+        <li><span>3</span><strong>Apply Online</strong><small>Submit your application.</small></li>
+        <li><span>4</span><strong>Track Progress</strong><small>Stay updated.</small></li>
+      </ol>
+      <a class="btn btn-outline" href="pages/apply.html">Apply Now</a>
+    </section>
+
+    <section class="home-news" aria-labelledby="newsTitle">
+      <div class="home-section-title">
+        <h2 id="newsTitle">Research & News</h2>
+        <p>Discover breakthroughs, publications, events, and community stories.</p>
+        <a href="pages/news.html">View all news</a>
+      </div>
+      <div class="news-preview-list">
+        <a href="pages/news.html">
+          <span>May 14, 2026</span>
+          <strong>WCU researchers develop low-cost water purification solution for rural communities</strong>
+        </a>
+        <a href="pages/news.html">
+          <span>Apr 28, 2026</span>
+          <strong>Business students launch fintech startup tracking SME cash flow</strong>
+        </a>
+        <a href="pages/news.html">
+          <span>Apr 10, 2026</span>
+          <strong>Annual Innovation Week showcases student solutions for Africa</strong>
+        </a>
       </div>
     </section>
   </main>
@@ -129,13 +187,14 @@
       <p class="footer-title">William Chichi University</p>
       <p>Ultra examina. Way beyond exams.</p>
     </div>
-    <div>
-      <p>contact@wcu.edu</p>
-      <p>Island Academic District, WCU Bay</p>
+    <div class="footer-links">
+      <a href="pages/academics.html">Academics</a>
+      <a href="pages/admissions.html">Admissions</a>
+      <a href="pages/research.html">Research</a>
+      <a href="#forum">Forum</a>
     </div>
   </footer>
 
   <script src="assets/js/script.js"></script>
 </body>
 </html>
-

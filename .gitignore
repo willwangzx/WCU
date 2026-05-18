@@ -22,6 +22,10 @@
 !*.cnf
 !*.example
 !*.ico
+!*.jpg
+!*.jpeg
+!*.png
+!*.webp
 !*.doc
 
 # Generated caches and local build output.

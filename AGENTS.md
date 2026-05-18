@@ -30,6 +30,7 @@ or security posture changes.
 - Current deployment docs: `docs/current-deployment.md`.
 - Team development structure: `docs/development-structure.md`.
 - Team development requirements: `docs/development-requirements.md`.
+- Website UI and visual design patterns: `docs/ui-design-patterns.md`.
 - Historical/alternative deployment docs: `docs/cloudflare-tunnel-deployment.md`,
   `docs/server-configuration.md`, and `server/README.md`.
 
@@ -51,6 +52,8 @@ or security posture changes.
   boundaries, generated outputs, or local-only areas change.
 - Update `docs/development-requirements.md` when required tools, versions,
   service ports, local setup commands, or development URLs change.
+- Update `docs/ui-design-patterns.md` when reusable UI patterns, visual tokens,
+  homepage section patterns, or asset rules change.
 - Never commit machine-local credentials, database dumps with real data, SSH
   keys, API keys, WordPress admin passwords, or local config files.
 
