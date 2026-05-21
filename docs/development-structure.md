@@ -51,13 +51,20 @@ development areas change.
 
 ## Team Workflow
 
-- Work on a branch for every non-trivial change.
+- Work on a topic branch for every non-trivial change.
+- Create each topic branch from the branch that will receive the merge.
+- Forum work uses `forum` as its integration branch. Start by updating
+  `forum`, create a new branch from it, develop and test there, then merge the
+  verified result back into `forum`.
 - Check `git status --short --branch` before editing so you do not overwrite
   another person's local work.
 - Keep commits scoped to one logical change.
 - Do not reformat unrelated files.
 - Do not edit generated `dist/` files unless the task specifically asks for
   deployment output.
+- Use the WSL local server guide before merging changes that affect runtime
+  behavior. Forum changes must be verified through the local WordPress/wpForo
+  server at `http://localhost:8081/community/`.
 - Update `TODO.md` when a new bug is discovered. Remove fixed bugs from
   `TODO.md` and record the fix in `changelog.md`.
 - Update this file when the repository structure or ownership boundaries change.

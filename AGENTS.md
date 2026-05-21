@@ -43,7 +43,11 @@ or security posture changes.
   and agents.
 - Before editing, check `git status --short --branch` and avoid overwriting
   files with unrelated local changes.
-- Keep work on a branch and keep each commit focused on one logical change.
+- Keep work on a topic branch created from the intended integration branch, and
+  keep each commit focused on one logical change.
+- For forum work, use `forum` as the integration branch: update `forum`, create
+  a new topic branch from it, test with the local WSL WordPress/wpForo server,
+  then merge the tested topic branch back into `forum`.
 - Do not reformat, rename, move, or delete unrelated files while doing a scoped
   task.
 - If another person's change touches the same file, read the file carefully and
@@ -218,7 +222,18 @@ Remaining maintenance:
 
 ## Workflow
 
-1. record bugs that need to be fixed in todo list (TODO.md), and delete the ones that are fixed and record the fixed bugs in the changelog (changelog.md)
-2. Before making any code changes, check the TODO.md file to see if there are any existing bugs that need to be fixed. If there are, prioritize fixing those bugs before adding new features or making other changes. Before applying the change, think why this approach is better than the existing one, and if it is not, then do not apply the change.
-3. After making code changes, run all the tests to ensure that the changes do not break any existing functionality. If any tests fail, investigate the cause and fix the issue before proceeding.
-4. After applying changes to the code, ensure that you update the documentation in this file to reflect the changes made. This includes updating any relevant sections such as architecture, testing, or known limitations.
+1. Record bugs that need to be fixed in `TODO.md`; when a bug is fixed,
+   remove it from `TODO.md` and record the fix in `changelog.md`.
+2. Before making code changes, check `git status --short --branch` and read
+   `TODO.md`. Prioritize active bugs before new features unless the requested
+   task explicitly says otherwise.
+3. Choose the target integration branch before editing. For forum work, the
+   target integration branch is `forum`; create a fresh branch from `forum`
+   before changing forum code or docs.
+4. Before applying a change, consider why the new approach is better than the
+   existing one. If it is not clearly better, do not apply it.
+5. After making code changes, run the relevant tests. Forum changes must also
+   be tested against the WSL local WordPress/wpForo server at
+   `http://localhost:8081/community/` before merging back to `forum`.
+6. After applying changes, update this file and related docs when architecture,
+   workflow, testing, deployment, or known limitations change.

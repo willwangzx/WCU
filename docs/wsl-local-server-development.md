@@ -260,31 +260,44 @@ forward from Windows the same way.
 
 ## Daily Development Loop
 
-1. Pull the latest branch and check local changes:
+1. Choose the integration branch and create a topic branch from it. For forum
+   work, always branch from `forum`:
+   ```powershell
+   git switch forum
+   git pull --ff-only
+   git switch -c feature/forum-short-description
+   ```
+   For non-forum work, use the branch that will receive the merge as the base.
+2. Check local changes before editing:
    ```powershell
    git status --short --branch
    ```
-2. Review `TODO.md` before adding features.
-3. Edit source files in the repo, not `/srv/wcu-site` or `/var/www/wcu-forum`
+3. Review `TODO.md` before adding features.
+4. Edit source files in the repo, not `/srv/wcu-site` or `/var/www/wcu-forum`
    unless you are intentionally debugging the local WordPress install.
-4. Build and publish static files:
+5. Build and publish static files:
    ```powershell
    npm run build
    wsl -d Ubuntu-24.04 -- bash -lc "export WCU_REPO_WSL=/mnt/c/Users/giaos/Desktop/Projects/WCU; sudo rsync -a --delete \"\$WCU_REPO_WSL/dist/\" /srv/wcu-site/"
    ```
-5. Restart the foreground backend if backend files changed, or re-sync
+6. Restart the foreground backend if backend files changed, or re-sync
    `/opt/wcu-backend` before restarting it.
-6. Run the smoke tests:
+7. For forum changes, sync the changed theme, MU plugin, or seeder files into
+   the local WSL WordPress install as needed, then verify the local forum before
+   merging back to `forum`.
+8. Run the smoke tests:
    ```powershell
    .\scripts\run-tests.ps1
    ```
-7. Verify the local server:
+9. Verify the local server:
    ```powershell
    curl.exe -I http://localhost:8088/
    curl.exe http://localhost:8088/api/application.php
    curl.exe -I http://localhost:8088/admin/
    curl.exe -I http://localhost:8081/community/
    ```
+10. Merge the topic branch back into its integration branch only after the
+    relevant local checks pass. Forum topic branches merge back into `forum`.
 
 ## Safety Rules
 

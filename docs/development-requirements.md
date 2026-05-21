@@ -14,6 +14,20 @@ commands change.
 Use `docs/wsl-local-server-development.md` for the full local server guide
 when simulating the production stack in WSL.
 
+## Branch And Verification Requirements
+
+- Use a topic branch for every non-trivial change.
+- Create the topic branch from the intended integration branch, keep commits
+  focused, and merge back only after local verification passes.
+- For forum work, the intended integration branch is `forum`. Update `forum`,
+  create a fresh topic branch from it, test with the local WSL forum server,
+  then merge the verified topic branch back into `forum`.
+- Do not merge runtime-affecting changes until the relevant local target has
+  been checked:
+  - Static site and admissions edge: `http://localhost:8088`
+  - Admissions backend direct target: `http://127.0.0.1:8080`
+  - WordPress/wpForo forum: `http://localhost:8081/community/`
+
 ## Static Site Requirements
 
 - Install Node.js and npm.
@@ -80,6 +94,18 @@ Current local direct-install convention:
 - Local database name: `wcu_forum`
 
 The credential file is machine-local and must not be committed.
+
+Forum development branch flow:
+
+```powershell
+git switch forum
+git pull --ff-only
+git switch -c feature/forum-short-description
+```
+
+Make source changes in the repo branch, sync or install them into the WSL forum
+as needed, verify `http://localhost:8081/community/`, then merge the topic
+branch back into `forum` only after the local forum check passes.
 
 Production forum deployment uses the current VM rather than a managed
 WordPress host:
