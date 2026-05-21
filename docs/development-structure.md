@@ -20,6 +20,8 @@ development areas change.
 |-- scripts/                   Local build, preview, and smoke-test scripts
 |-- tests/                     Test fixtures and checks
 |-- docs/                      Team docs, deployment notes, and planning docs
+|   `-- wsl-local-server-development.md
+|                                WSL local production-like server guide
 |-- AGENTS.md                  Agent and contributor operating rules
 |-- README.md                  Project overview for humans
 |-- TODO.md                    Known bugs and prioritized maintenance work
@@ -39,6 +41,8 @@ development areas change.
   outside the repository at `/var/www/wcu-forum`.
 - Deployment and operational changes belong in `docs/current-deployment.md` and
   `AGENTS.md`.
+- Local WSL server simulation steps belong in
+  `docs/wsl-local-server-development.md`.
 - Historical deployment notes stay in `docs/cloudflare-tunnel-deployment.md`,
   `docs/server-configuration.md`, and `server/README.md` unless the task is
   explicitly about cleanup or history.

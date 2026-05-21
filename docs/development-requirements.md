@@ -11,6 +11,9 @@ commands change.
 - PowerShell on Windows
 - WSL2 with Ubuntu 24.04 for Windows contributors
 
+Use `docs/wsl-local-server-development.md` for the full local server guide
+when simulating the production stack in WSL.
+
 ## Static Site Requirements
 
 - Install Node.js and npm.
@@ -152,6 +155,7 @@ same way as `localhost`.
 ## Service Ports
 
 - Static preview: chosen by `scripts/serve-site.ps1`.
+- WSL local nginx edge: `localhost:8088`.
 - Admissions backend: `127.0.0.1:8080`.
 - WordPress/wpForo local development: `localhost:8081`.
 - Production HTTP/HTTPS: `80` and `443` behind Cloudflare.

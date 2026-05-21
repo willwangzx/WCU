@@ -30,6 +30,8 @@ or security posture changes.
 - Current deployment docs: `docs/current-deployment.md`.
 - Team development structure: `docs/development-structure.md`.
 - Team development requirements: `docs/development-requirements.md`.
+- WSL local server development guide:
+  `docs/wsl-local-server-development.md`.
 - Website UI and visual design patterns: `docs/ui-design-patterns.md`.
 - Historical/alternative deployment docs: `docs/cloudflare-tunnel-deployment.md`,
   `docs/server-configuration.md`, and `server/README.md`.
@@ -62,6 +64,8 @@ or security posture changes.
 - Build static output: `npm run build`.
 - Run local smoke tests: `.\scripts\run-tests.ps1`.
 - Start local preview: `.\scripts\serve-site.ps1`.
+- Simulate the production-like local server in WSL:
+  `docs/wsl-local-server-development.md`.
 - Verify local WordPress/wpForo forum:
   ```powershell
   curl.exe -I http://localhost:8081/community/
@@ -89,6 +93,7 @@ or security posture changes.
 - Forum SMTP MU plugin source:
   `server/wordpress/mu-plugins/wcu-forum-smtp.php`.
 - Local backend target: `http://127.0.0.1:8080`.
+- Local WSL nginx edge target: `http://localhost:8088`.
 - Local WordPress/wpForo development target: `http://localhost:8081/community/`
   with files at `/var/www/wcu-forum` inside WSL.
 - Public edge: `nginx` listens on `80` and `443`, serves the static site,

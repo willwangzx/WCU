@@ -4,17 +4,21 @@ from __future__ import annotations
 import base64
 import csv
 import hashlib
+import hmac
 import html
 import io
 import json
 import mimetypes
 import os
+import re
 import sqlite3
 import sys
+import time
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib import error as urlerror, request as urlrequest
 from urllib.parse import parse_qs, urlencode, urlparse
 
 
@@ -27,11 +31,38 @@ DEFAULT_CONFIG = {
     "cors": {"allowed_origins": []},
     "database": {"path": "/var/lib/wcu-data/wcu.sqlite"},
     "admin": {"username": "admin", "password_hash": ""},
+    "recaptcha": {
+        "enabled": False,
+        "secret_key": "",
+        "secret_key_env": "WCU_RECAPTCHA_SECRET_KEY",
+        "verify_url": "https://www.google.com/recaptcha/api/siteverify",
+        "timeout_seconds": 5,
+        "allowed_hostnames": [],
+        "minimum_score": None,
+        "expected_action": "",
+    },
 }
 
 
 class RequestParseError(ValueError):
     pass
+
+
+class UnsupportedMediaTypeError(RequestParseError):
+    pass
+
+
+EMAIL_PATTERN = re.compile(
+    r"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+    r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?"
+    r"(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$"
+)
+SUPPORTED_FORM_CONTENT_TYPES = {"application/x-www-form-urlencoded"}
+SCRYPT_MAXMEM = 64 * 1024 * 1024
+ADMIN_CSRF_TTL_SECONDS = 12 * 60 * 60
+ADMIN_LOGIN_MAX_FAILURES = 5
+ADMIN_LOGIN_WINDOW_SECONDS = 15 * 60
+ADMIN_LOGIN_FAILURES: dict[str, list[float]] = {}
 
 VALID_TERMS = ["Fall 2026", "Spring 2027", "Fall 2027"]
 VALID_PROGRAMS = [
@@ -123,6 +154,17 @@ def normalize_payload(payload: dict[str, str]) -> dict[str, object]:
     }
 
 
+def is_valid_email(email: str) -> bool:
+    if len(email) > 254 or email.count("@") != 1:
+        return False
+
+    local_part = email.split("@", 1)[0]
+    if not local_part or local_part.startswith(".") or local_part.endswith(".") or ".." in local_part:
+        return False
+
+    return EMAIL_PATTERN.fullmatch(email) is not None
+
+
 def validate_application(app: dict[str, object]) -> list[str]:
     errors: list[str] = []
     if len(str(app["first_name"])) < 2:
@@ -130,7 +172,7 @@ def validate_application(app: dict[str, object]) -> list[str]:
     if len(str(app["last_name"])) < 2:
         errors.append("Last name must be at least 2 characters.")
     email = str(app["email"])
-    if "@" not in email or "." not in email.split("@")[-1]:
+    if not is_valid_email(email):
         errors.append("Please provide a valid email address.")
     if len(str(app["phone"])) < 5:
         errors.append("Phone number must be at least 5 characters.")
@@ -165,6 +207,100 @@ def validate_application(app: dict[str, object]) -> list[str]:
     return errors
 
 
+def recaptcha_config() -> dict:
+    config = CONFIG.get("recaptcha", {})
+    return config if isinstance(config, dict) else {}
+
+
+def recaptcha_secret_key() -> str:
+    config = recaptcha_config()
+    env_name = str(config.get("secret_key_env") or "WCU_RECAPTCHA_SECRET_KEY").strip()
+    env_secret = os.environ.get(env_name, "") if env_name else ""
+    return str(env_secret or config.get("secret_key") or "").strip()
+
+
+def recaptcha_is_enabled() -> bool:
+    config = recaptcha_config()
+    return config.get("enabled") is True or recaptcha_secret_key() != ""
+
+
+def recaptcha_token_from_payload(payload: dict[str, str]) -> str:
+    return first(payload, "recaptcha_token", "g-recaptcha-response", "g_recaptcha_response").strip()
+
+
+def recaptcha_verification_errors(payload: dict[str, str], client_ip: str) -> list[str]:
+    if not recaptcha_is_enabled():
+        return []
+
+    secret_key = recaptcha_secret_key()
+    if not secret_key:
+        return ["reCAPTCHA protection is not configured."]
+
+    token = recaptcha_token_from_payload(payload)
+    if not token:
+        return ["Please complete the reCAPTCHA challenge."]
+
+    config = recaptcha_config()
+    verify_url = str(config.get("verify_url") or DEFAULT_CONFIG["recaptcha"]["verify_url"])
+    request_payload = {
+        "secret": secret_key,
+        "response": token,
+    }
+    if client_ip:
+        request_payload["remoteip"] = client_ip
+
+    try:
+        timeout_seconds = float(config.get("timeout_seconds") or DEFAULT_CONFIG["recaptcha"]["timeout_seconds"])
+    except (TypeError, ValueError):
+        timeout_seconds = float(DEFAULT_CONFIG["recaptcha"]["timeout_seconds"])
+    if timeout_seconds <= 0:
+        timeout_seconds = float(DEFAULT_CONFIG["recaptcha"]["timeout_seconds"])
+    request_body = urlencode(request_payload).encode("utf-8")
+    request = urlrequest.Request(
+        verify_url,
+        data=request_body,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        method="POST",
+    )
+
+    try:
+        with urlrequest.urlopen(request, timeout=timeout_seconds) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except (OSError, TimeoutError, ValueError, urlerror.URLError, json.JSONDecodeError):
+        return ["Unable to verify reCAPTCHA right now. Please try again."]
+
+    if not isinstance(result, dict) or result.get("success") is not True:
+        return ["reCAPTCHA verification failed. Please try again."]
+
+    configured_hostnames = config.get("allowed_hostnames", []) or []
+    if isinstance(configured_hostnames, str):
+        configured_hostnames = [configured_hostnames]
+    allowed_hostnames = [
+        str(hostname).strip().lower()
+        for hostname in configured_hostnames
+        if str(hostname).strip()
+    ]
+    response_hostname = str(result.get("hostname") or "").strip().lower()
+    if allowed_hostnames and response_hostname not in allowed_hostnames:
+        return ["reCAPTCHA verification failed for this site."]
+
+    expected_action = str(config.get("expected_action") or "").strip()
+    if expected_action and str(result.get("action") or "").strip() != expected_action:
+        return ["reCAPTCHA verification failed for this action."]
+
+    minimum_score = config.get("minimum_score")
+    if minimum_score is not None and "score" in result:
+        try:
+            score = float(result.get("score"))
+            required_score = float(minimum_score)
+        except (TypeError, ValueError):
+            return ["reCAPTCHA verification returned an invalid score."]
+        if score < required_score:
+            return ["reCAPTCHA verification score was too low."]
+
+    return []
+
+
 def insert_application(app: dict[str, object], client_ip: str, user_agent: str, origin_url: str) -> int:
     created_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     with db() as connection:
@@ -186,11 +322,106 @@ def insert_application(app: dict[str, object], client_ip: str, user_agent: str, 
         return int(cursor.lastrowid)
 
 
-def verify_password(password: str, stored_hash: str) -> bool:
-    if not stored_hash.startswith("sha256$"):
+def verify_scrypt_secret(secret: bytes, stored_hash: str) -> bool:
+    parts = stored_hash.split("$")
+    if len(parts) != 6:
         return False
-    digest = hashlib.sha256(password.encode("utf-8")).hexdigest()
-    return digest == stored_hash[len("sha256$"):]
+
+    try:
+        _, n_value, r_value, p_value, salt_hex, expected_hex = parts
+        actual = hashlib.scrypt(
+            secret,
+            salt=bytes.fromhex(salt_hex),
+            n=int(n_value),
+            r=int(r_value),
+            p=int(p_value),
+            dklen=len(bytes.fromhex(expected_hex)),
+            maxmem=SCRYPT_MAXMEM,
+        ).hex()
+    except (ValueError, TypeError):
+        return False
+
+    return hmac.compare_digest(actual, expected_hex)
+
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    normalized_hash = stored_hash.strip()
+    password_bytes = password.encode("utf-8")
+
+    if normalized_hash.startswith("scrypt$"):
+        return verify_scrypt_secret(password_bytes, normalized_hash)
+
+    if normalized_hash.startswith("scrypt-sha256$"):
+        legacy_digest = hashlib.sha256(password_bytes).hexdigest().encode("ascii")
+        return verify_scrypt_secret(legacy_digest, "scrypt$" + normalized_hash.split("$", 1)[1])
+
+    if (
+        normalized_hash.startswith("sha256$")
+        and os.environ.get("WCU_ALLOW_LEGACY_SHA256_ADMIN_HASH") == "1"
+    ):
+        expected = normalized_hash[len("sha256$"):]
+        actual = hashlib.sha256(password_bytes).hexdigest()
+        return hmac.compare_digest(actual, expected)
+
+    return False
+
+
+def admin_csrf_secret() -> bytes:
+    configured_secret = os.environ.get("WCU_ADMIN_CSRF_SECRET")
+    if configured_secret:
+        return configured_secret.encode("utf-8")
+
+    admin_config = CONFIG.get("admin", {})
+    return str(admin_config.get("csrf_secret") or admin_config.get("password_hash") or "").encode("utf-8")
+
+
+def make_admin_csrf_token(now: float | None = None) -> str:
+    bucket = int((now if now is not None else time.time()) // ADMIN_CSRF_TTL_SECONDS)
+    message = f"{CONFIG['admin']['username']}:{bucket}".encode("utf-8")
+    mac = hmac.new(admin_csrf_secret(), message, hashlib.sha256).hexdigest()
+    return f"{bucket}:{mac}"
+
+
+def validate_admin_csrf_token(token: str) -> bool:
+    try:
+        bucket_text, submitted_mac = token.split(":", 1)
+        bucket = int(bucket_text)
+    except (ValueError, AttributeError):
+        return False
+
+    current_bucket = int(time.time() // ADMIN_CSRF_TTL_SECONDS)
+    if bucket not in {current_bucket, current_bucket - 1}:
+        return False
+
+    message = f"{CONFIG['admin']['username']}:{bucket}".encode("utf-8")
+    expected_mac = hmac.new(admin_csrf_secret(), message, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(submitted_mac, expected_mac)
+
+
+def admin_login_key(client_ip: str, username: str) -> str:
+    return f"{client_ip}:{username.strip().lower()}"
+
+
+def recent_admin_failures(key: str) -> list[float]:
+    cutoff = time.time() - ADMIN_LOGIN_WINDOW_SECONDS
+    failures = [attempt for attempt in ADMIN_LOGIN_FAILURES.get(key, []) if attempt >= cutoff]
+    ADMIN_LOGIN_FAILURES[key] = failures
+    return failures
+
+
+def admin_login_is_limited(client_ip: str, username: str) -> bool:
+    return len(recent_admin_failures(admin_login_key(client_ip, username))) >= ADMIN_LOGIN_MAX_FAILURES
+
+
+def record_admin_login_failure(client_ip: str, username: str) -> None:
+    key = admin_login_key(client_ip, username)
+    failures = recent_admin_failures(key)
+    failures.append(time.time())
+    ADMIN_LOGIN_FAILURES[key] = failures
+
+
+def clear_admin_login_failures(client_ip: str, username: str) -> None:
+    ADMIN_LOGIN_FAILURES.pop(admin_login_key(client_ip, username), None)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -214,8 +445,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def read_body(self) -> dict[str, str]:
         raw = self.rfile.read(int(self.headers.get("Content-Length") or "0"))
-        ctype = (self.headers.get("Content-Type") or "").lower()
-        if "application/json" in ctype:
+        ctype = (self.headers.get("Content-Type") or "").lower().split(";", 1)[0].strip()
+        if ctype == "application/json":
             try:
                 parsed = json.loads(raw.decode("utf-8") or "{}")
             except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -223,6 +454,10 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(parsed, dict):
                 raise RequestParseError("Request body must be a JSON object.")
             return {str(k): "" if v is None else str(v) for k, v in parsed.items()}
+        if ctype not in SUPPORTED_FORM_CONTENT_TYPES:
+            if ctype == "" and raw == b"":
+                return {}
+            raise UnsupportedMediaTypeError("Unsupported Content-Type. Use application/json or application/x-www-form-urlencoded.")
         try:
             parsed = parse_qs(raw.decode("utf-8"), keep_blank_values=True)
         except UnicodeDecodeError as exc:
@@ -240,13 +475,25 @@ class Handler(BaseHTTPRequestHandler):
             decoded = base64.b64decode(header.split(" ", 1)[1]).decode("utf-8")
             username, password = decoded.split(":", 1)
         except Exception:
+            record_admin_login_failure(self.client_address[0], "")
             self.send_error(HTTPStatus.UNAUTHORIZED)
             return False
-        if username != CONFIG["admin"]["username"] or not verify_password(password, CONFIG["admin"]["password_hash"]):
+
+        if admin_login_is_limited(self.client_address[0], username):
+            self.send_response(HTTPStatus.TOO_MANY_REQUESTS)
+            self.send_header("Retry-After", str(ADMIN_LOGIN_WINDOW_SECONDS))
+            self.end_headers()
+            return False
+
+        username_matches = hmac.compare_digest(username, CONFIG["admin"]["username"])
+        password_matches = verify_password(password, CONFIG["admin"]["password_hash"])
+        if not username_matches or not password_matches:
+            record_admin_login_failure(self.client_address[0], username)
             self.send_response(HTTPStatus.UNAUTHORIZED)
             self.send_header("WWW-Authenticate", 'Basic realm="WCU Admin"')
             self.end_headers()
             return False
+        clear_admin_login_failures(self.client_address[0], username)
         return True
 
     def send_json(self, status: HTTPStatus, payload: dict, head_only: bool = False) -> None:
@@ -275,6 +522,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/admin/export.csv":
             if self.require_admin():
+                query = parse_qs(parsed.query, keep_blank_values=True)
+                token = (query.get("csrf_token") or [""])[-1]
+                if not validate_admin_csrf_token(token):
+                    self.send_error(HTTPStatus.FORBIDDEN)
+                    return
                 self.export_csv(parsed)
             return
         if self.serve_static(parsed.path):
@@ -291,8 +543,14 @@ class Handler(BaseHTTPRequestHandler):
                 try:
                     data = self.read_body()
                     application_id = int(data.get("id", "0") or "0")
+                except UnsupportedMediaTypeError as exc:
+                    self.send_error(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, str(exc))
+                    return
                 except (RequestParseError, ValueError):
                     self.send_error(HTTPStatus.BAD_REQUEST)
+                    return
+                if not validate_admin_csrf_token(data.get("csrf_token", "")):
+                    self.send_error(HTTPStatus.FORBIDDEN)
                     return
                 with db() as connection:
                     connection.execute("DELETE FROM applications WHERE id = ?", [application_id])
@@ -372,12 +630,20 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(HTTPStatus.FORBIDDEN, {"ok": False, "errors": ["This origin is not allowed to submit applications."]})
             return
         try:
-            app = normalize_payload(self.read_body())
+            payload = self.read_body()
+            app = normalize_payload(payload)
+        except UnsupportedMediaTypeError as exc:
+            self.send_json(HTTPStatus.UNSUPPORTED_MEDIA_TYPE, {"ok": False, "errors": [str(exc)]})
+            return
         except RequestParseError as exc:
             self.send_json(HTTPStatus.BAD_REQUEST, {"ok": False, "errors": [str(exc)]})
             return
         if str(app["honeypot"]):
             self.send_json(HTTPStatus.BAD_REQUEST, {"ok": False, "errors": ["Spam detected."]})
+            return
+        recaptcha_errors = recaptcha_verification_errors(payload, self.client_address[0])
+        if recaptcha_errors:
+            self.send_json(HTTPStatus.BAD_REQUEST, {"ok": False, "errors": recaptcha_errors})
             return
         errors = validate_application(app)
         if errors:
@@ -390,6 +656,8 @@ class Handler(BaseHTTPRequestHandler):
         query = parse_qs(parsed.query, keep_blank_values=True)
         filters = {"q": (query.get("q") or [""])[-1], "entry_term": (query.get("entry_term") or [""])[-1], "program": (query.get("program") or [""])[-1]}
         selected_id = int((query.get("id") or ["0"])[-1] or "0")
+        csrf_token = make_admin_csrf_token()
+        export_params = {**filters, "csrf_token": csrf_token}
         clauses, params = [], []
         if filters["q"]:
             search = f"%{filters['q']}%"
@@ -420,11 +688,11 @@ class Handler(BaseHTTPRequestHandler):
             <p><strong>Entry Term:</strong> {html.escape(selected['entry_term'])}</p>
             <p><strong>Statement:</strong><br>{html.escape(selected['personal_statement'])}</p>
             <p><strong>Portfolio:</strong> <a href="{html.escape(selected['portfolio_url'])}" target="_blank" rel="noopener noreferrer">{html.escape(selected['portfolio_url'])}</a></p>
-            <form method="post" action="/admin/delete"><input type="hidden" name="id" value="{selected['id']}"><button type="submit">Delete application</button></form>
+            <form method="post" action="/admin/delete"><input type="hidden" name="csrf_token" value="{html.escape(csrf_token)}"><input type="hidden" name="id" value="{selected['id']}"><button type="submit">Delete application</button></form>
             """
         body = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>WCU Admin</title>
 <style>body{{font-family:Arial,sans-serif;background:#f7f3ea;margin:0;padding:24px}}a{{color:#0f5a7a}}.grid{{display:grid;grid-template-columns:minmax(280px,360px) 1fr;gap:16px}}.card{{background:#fff;border:1px solid #d8d1c4;border-radius:12px;padding:16px}}label{{display:block;margin-bottom:10px}}input,select,button{{font:inherit;padding:8px 10px}}ul{{padding-left:18px}}</style></head>
-<body><h1>WCU Admissions Admin</h1><p>Total applications: {count} · <a href="/admin/export.csv">Export CSV</a></p>
+<body><h1>WCU Admissions Admin</h1><p>Total applications: {count} · <a href="/admin/export.csv?{urlencode(export_params)}">Export CSV</a></p>
 <div class="card" style="margin-bottom:16px"><form method="get" action="/admin/"><label>Search <input type="text" name="q" value="{html.escape(filters['q'])}"></label><label>Entry Term <select name="entry_term"><option value="">All</option>{''.join(f'<option value="{html.escape(term)}" {"selected" if filters["entry_term"] == term else ""}>{html.escape(term)}</option>' for term in VALID_TERMS)}</select></label><label>Program <select name="program"><option value="">All</option>{''.join(f'<option value="{html.escape(program)}" {"selected" if filters["program"] == program else ""}>{html.escape(program)}</option>' for program in VALID_PROGRAMS)}</select></label><button type="submit">Apply filters</button></form></div>
 <div class="grid"><div class="card"><ul>{items}</ul></div><div class="card">{detail}</div></div></body></html>"""
         self.send_response(HTTPStatus.OK)
