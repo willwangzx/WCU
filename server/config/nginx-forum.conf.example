@@ -1,0 +1,76 @@
+# Requires this http-level rate-limit zone, for example in
+# /etc/nginx/conf.d/wcu-forum-rate-limit.conf:
+#
+# limit_req_zone $binary_remote_addr zone=wcu_forum_login:10m rate=10r/m;
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name forum.wcuedu.net;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name forum.wcuedu.net;
+
+    root /var/www/wcu-forum;
+    index index.php index.html;
+
+    ssl_certificate /etc/nginx/ssl/wcuedu-origin.crt;
+    ssl_certificate_key /etc/nginx/ssl/wcuedu-origin.key;
+
+    add_header Strict-Transport-Security "max-age=15552000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+    client_max_body_size 128m;
+
+    location = / {
+        return 302 /community/;
+    }
+
+    location = /xmlrpc.php {
+        return 403;
+    }
+
+    location ^~ /tools/logic-lab/assets/ {
+        expires 30d;
+        access_log off;
+        try_files $uri =404;
+    }
+
+    location ^~ /tools/logic-lab/ {
+        index index.html;
+        try_files $uri $uri/ /tools/logic-lab/index.html;
+    }
+
+    location = /wp-login.php {
+        limit_req zone=wcu_forum_login burst=10 nodelay;
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
+    location ~* \.(?:css|js|jpg|jpeg|gif|png|svg|webp|ico|woff2?)$ {
+        expires 30d;
+        access_log off;
+        try_files $uri =404;
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+}

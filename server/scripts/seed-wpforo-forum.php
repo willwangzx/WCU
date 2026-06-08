@@ -424,6 +424,7 @@ $structure = [
             ['Study Notes & Guides', 'study-notes-guides', 'Post concise notes, study systems, and course guides.'],
             ['IB Experience', 'ib-experience', 'Discuss IB learning, assessment, and preparation experience.'],
             ['Tools & Templates', 'tools-templates', 'Share useful tools, templates, checklists, and workflows.'],
+            ['Fun & Useful Tools', 'fun-useful-tools', 'Share small interactive tools, calculators, visualizers, templates, and learning utilities.'],
         ],
     ],
     [
@@ -495,9 +496,19 @@ Starting a project? Include the problem, the skills needed, the current status, 
 Good project posts make it easy for classmates, mentors, and future students to decide whether they can contribute.
 HTML;
 
+$logic_lab_prompt = <<<HTML
+Logic Lab is an interactive tool for exploring logic gates, truth tables, Boolean expressions, and simple logic statements.
+
+Open it here:
+https://forum.wcuedu.net/tools/logic-lab/
+
+Use this board to share other small utilities that help students learn, prototype, calculate, visualize, or organize their work.
+HTML;
+
 wcu_forum_seed_topic($created_forums['announcements'], 'Welcome to the WCU Forum', 'welcome-to-the-wcu-forum', $welcome);
 wcu_forum_seed_topic($created_forums['community-guidelines'], 'Community Guidelines', 'community-guidelines', $guidelines);
 wcu_forum_seed_topic($created_forums['project-ideas-team-up'], 'How to post a project idea', 'how-to-post-a-project-idea', $project_prompt);
+wcu_forum_seed_topic($created_forums['fun-useful-tools'], 'Logic Lab: logic gates, truth tables, and Boolean expressions', 'logic-lab-logic-gates-truth-tables-boolean-expressions', $logic_lab_prompt);
 
 wcu_forum_update_antispam_settings();
 wcu_forum_update_recaptcha_settings();

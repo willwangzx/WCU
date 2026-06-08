@@ -1,6 +1,6 @@
 # WCU Current Production Deployment
 
-Updated: 2026-05-18
+Updated: 2026-06-08
 
 This document records the current live deployment after the migration to the
 new server.
@@ -15,6 +15,7 @@ Browser
      -> static site from /srv/wcu-site
      -> /api and /admin reverse proxy to wcu-backend.service on 127.0.0.1:8080
      -> forum.wcuedu.net -> PHP-FPM -> WordPress/wpForo at /var/www/wcu-forum
+        -> /tools/logic-lab/ static Logic Lab app
         -> MySQL database wcu_forum
 ```
 
@@ -43,6 +44,8 @@ Cloudflare SSL/TLS mode should be `Full (strict)`.
 - Nginx site config: `/etc/nginx/sites-available/wcu-site`
 - Forum WordPress root: `/var/www/wcu-forum`
 - Forum nginx site config: `/etc/nginx/sites-available/wcu-forum`
+- Forum Logic Lab static root: `/var/www/wcu-forum/tools/logic-lab`
+- Forum Logic Lab public URL: `https://forum.wcuedu.net/tools/logic-lab/`
 - Forum production secrets: `/root/.wcu-forum-prod.env`
 - Forum database: MySQL database `wcu_forum`
 - Forum theme source in repo: `server/wordpress/themes/wcu-forum/`
@@ -145,6 +148,40 @@ Expected:
 - WordPress database check: all tables OK
 - wpForo plugin: active
 
+## Deploy Forum Tool Updates
+
+Logic Lab remains an external project at `D:\Projects\Logic gate`. Build it
+with the forum subpath as the Vite base:
+
+```powershell
+cd "D:\Projects\Logic gate"
+npm test
+npm run build -- --base /tools/logic-lab/
+```
+
+Upload the generated `dist/` contents to
+`/var/www/wcu-forum/tools/logic-lab/` on `178.238.234.111`. The forum nginx
+site serves `/tools/logic-lab/` as static files before WordPress fallback.
+From WSL, the upload can be run with rsync and the production SSH key:
+
+```bash
+rsync -a --delete -e "ssh -i /mnt/c/Users/giaos/Desktop/Projects/WCU/keys/wcu-178.238.234.111-root-ed25519" \
+  "/mnt/d/Projects/Logic gate/dist/" \
+  root@178.238.234.111:/var/www/wcu-forum/tools/logic-lab/
+```
+
+After upload, verify:
+
+```powershell
+curl.exe -I https://forum.wcuedu.net/tools/logic-lab/
+curl.exe -I https://forum.wcuedu.net/community/
+```
+
+Expected:
+
+- Logic Lab: `200 OK`
+- Forum: `200 OK` with wpForo markup from WordPress
+
 ## Backend Notes
 
 The live backend is the Python deployment path:
@@ -168,6 +205,7 @@ restrict `allowed_hostnames` and, for v3-style tokens, `minimum_score` and
 
 - Public URL: `https://forum.wcuedu.net/community/`
 - Root `/` on `forum.wcuedu.net` redirects to `/community/`
+- Logic Lab tool URL: `https://forum.wcuedu.net/tools/logic-lab/`
 - WordPress root: `/var/www/wcu-forum`
 - WordPress `home` and `siteurl`: `https://forum.wcuedu.net`
 - WordPress registration is enabled with default role `subscriber`

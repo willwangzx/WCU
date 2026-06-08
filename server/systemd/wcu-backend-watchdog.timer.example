@@ -1,0 +1,10 @@
+[Unit]
+Description=Run WCU backend watchdog every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+Unit=wcu-backend-watchdog.service
+
+[Install]
+WantedBy=timers.target

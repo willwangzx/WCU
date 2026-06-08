@@ -91,6 +91,8 @@ or security posture changes.
 - Production WordPress/wpForo forum root: `/var/www/wcu-forum`.
 - Production WordPress/wpForo forum URL:
   `https://forum.wcuedu.net/community/`.
+- Production forum tool URL: `https://forum.wcuedu.net/tools/logic-lab/`.
+- Production forum tool root: `/var/www/wcu-forum/tools/logic-lab`.
 - Production forum database: MySQL database `wcu_forum`.
 - Production forum secrets: `/root/.wcu-forum-prod.env`.
 - Forum theme source: `server/wordpress/themes/wcu-forum/`.
@@ -160,6 +162,13 @@ or security posture changes.
   - API: `{"ok": true, "service": "wcu-applications-api"}`.
   - Admin: `401 Unauthorized` until valid Basic Auth credentials are supplied.
   - Forum: `200 OK` and wpForo markup from WordPress, not static homepage HTML.
+- Build Logic Lab from `D:\Projects\Logic gate` with
+  `npm run build -- --base /tools/logic-lab/`, upload `dist/` to
+  `/var/www/wcu-forum/tools/logic-lab/`, then verify:
+  ```powershell
+  curl.exe -I https://forum.wcuedu.net/tools/logic-lab/
+  curl.exe -I https://forum.wcuedu.net/community/
+  ```
 
 ## Security State
 

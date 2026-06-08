@@ -37,7 +37,7 @@ development areas change.
 - Admissions backend work belongs in `server/`. Check both Python and legacy PHP
   paths when behavior overlaps.
 - Forum deployment artifacts live in `server/scripts/`, `server/config/`, and
-  `server/wordpress/`. The production WordPress/wpForo files themselves live
+  `server/wordpress/`. The production WordPress/wpFoqiro files themselves live
   outside the repository at `/var/www/wcu-forum`.
 - Deployment and operational changes belong in `docs/current-deployment.md` and
   `AGENTS.md`.

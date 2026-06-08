@@ -8,6 +8,7 @@ import unittest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_FORUM_URL = "https://forum.wcuedu.net/community/"
+PUBLIC_LOGIC_LAB_URL = "https://forum.wcuedu.net/tools/logic-lab/"
 
 KEY_PAGES = [
     REPO_ROOT / "index.html",
@@ -196,12 +197,15 @@ class SiteSmokeTests(unittest.TestCase):
     def test_forum_installer_configures_verification_and_theme(self) -> None:
         installer = (REPO_ROOT / "server" / "scripts" / "install-wordpress-forum.sh").read_text(encoding="utf-8")
         seeder = (REPO_ROOT / "server" / "scripts" / "seed-wpforo-forum.php").read_text(encoding="utf-8")
+        nginx_config = (REPO_ROOT / "server" / "config" / "nginx-forum.conf.example").read_text(encoding="utf-8")
         smtp_plugin = (REPO_ROOT / "server" / "wordpress" / "mu-plugins" / "wcu-forum-smtp.php").read_text(encoding="utf-8")
         theme_css = (REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "assets" / "css" / "wcu-forum.css").read_text(encoding="utf-8")
 
         for expected in (
             "WCU_FORUM_SMTP_HOST",
             "WCU_FORUM_SMTP_PASSWORD",
+            "WCU_FORUM_RECAPTCHA_SITE_KEY",
+            "WCU_FORUM_RECAPTCHA_SECRET_KEY",
             "wp-content/mu-plugins/wcu-forum-smtp.php",
             "wp theme activate",
         ):
@@ -210,6 +214,15 @@ class SiteSmokeTests(unittest.TestCase):
 
         self.assertIn("'user_register_email_confirm'] = 1", seeder)
         self.assertIn("'manually_approval'] = 0", seeder)
+        self.assertIn("wpforo_recaptcha", seeder)
+        self.assertIn("wcu_forum_update_recaptcha_settings", seeder)
+        self.assertIn("Fun & Useful Tools", seeder)
+        self.assertIn("fun-useful-tools", seeder)
+        self.assertIn(PUBLIC_LOGIC_LAB_URL, seeder)
+        self.assertIn("location ^~ /tools/logic-lab/", installer)
+        self.assertIn("location ^~ /tools/logic-lab/assets/", installer)
+        self.assertIn("location ^~ /tools/logic-lab/", nginx_config)
+        self.assertIn("location ^~ /tools/logic-lab/assets/", nginx_config)
         self.assertIn("phpmailer_init", smtp_plugin)
         self.assertIn("wcu-site-header", theme_css)
         self.assertIn("#wpforo #wpforo-wrap", theme_css)
@@ -232,6 +245,7 @@ class SiteSmokeTests(unittest.TestCase):
         self.assertIn('id="writingMaterialsForm"', writing_page)
         self.assertIn('action="../api/application.php"', writing_page)
         self.assertIn('id="applicationMessage"', writing_page)
+        self.assertIn('id="applicationRecaptcha"', writing_page)
         self.assertIn('src="../assets/js/site-config.js"', writing_page)
 
         for field in EXPECTED_WRITING_FIELDS:

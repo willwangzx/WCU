@@ -17,6 +17,10 @@ Windows browser
 Windows browser
   -> http://localhost:8081/community/
   -> WSL WordPress/wpForo forum
+
+Windows browser
+  -> http://localhost:8081/tools/logic-lab/
+  -> WSL nginx static files from /var/www/wcu-forum/tools/logic-lab
 ```
 
 Production still uses Cloudflare, public DNS, nginx on `80/443`, the Python
@@ -233,6 +237,17 @@ server {
         try_files $uri $uri/ /index.php?$args;
     }
 
+    location ^~ /tools/logic-lab/assets/ {
+        expires 30d;
+        access_log off;
+        try_files $uri =404;
+    }
+
+    location ^~ /tools/logic-lab/ {
+        index index.html;
+        try_files $uri $uri/ /tools/logic-lab/index.html;
+    }
+
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
@@ -257,6 +272,32 @@ curl.exe -I http://localhost:8081/community/
 
 Use `localhost` for the browser and curl URL. On WSL, `127.0.0.1:8081` may not
 forward from Windows the same way.
+
+## Forum Tool Static Apps
+
+Logic Lab stays in its own project at `D:\Projects\Logic gate`, but local and
+production forum nginx serve its built output from `/tools/logic-lab/`.
+
+Build from PowerShell:
+
+```powershell
+cd "D:\Projects\Logic gate"
+npm test
+npm run build -- --base /tools/logic-lab/
+```
+
+Publish the generated output into the WSL forum root:
+
+```powershell
+wsl -d Ubuntu-24.04 -- bash -lc "sudo mkdir -p /var/www/wcu-forum/tools/logic-lab && sudo rsync -a --delete '/mnt/d/Projects/Logic gate/dist/' /var/www/wcu-forum/tools/logic-lab/"
+```
+
+Verify:
+
+```powershell
+curl.exe -I http://localhost:8081/tools/logic-lab/
+curl.exe -I http://localhost:8081/community/
+```
 
 ## Daily Development Loop
 
@@ -295,6 +336,7 @@ forward from Windows the same way.
    curl.exe http://localhost:8088/api/application.php
    curl.exe -I http://localhost:8088/admin/
    curl.exe -I http://localhost:8081/community/
+   curl.exe -I http://localhost:8081/tools/logic-lab/
    ```
 10. Merge the topic branch back into its integration branch only after the
     relevant local checks pass. Forum topic branches merge back into `forum`.
