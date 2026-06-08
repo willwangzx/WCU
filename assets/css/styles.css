@@ -143,6 +143,538 @@ main {
   padding: 0 24px;
 }
 
+.home-main {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  background: #ffffff;
+}
+
+.home-main h1,
+.home-main h2,
+.home-main h3,
+.home-main p {
+  letter-spacing: 0;
+}
+
+.home-hero {
+  position: relative;
+  min-height: clamp(540px, 72vh, 760px);
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.home-hero-media {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 24%, rgba(255, 255, 255, 0.72) 43%, rgba(255, 255, 255, 0.08) 64%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 72%, #ffffff 100%),
+    url("../img/wcu-campus-collaboration.png");
+  background-size: cover;
+  background-position: center right;
+}
+
+.home-hero-content {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--max));
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 90px) 24px;
+}
+
+.home-hero h1 {
+  max-width: 11ch;
+  margin: 0;
+  color: #061a3f;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: clamp(3rem, 7.8vw, 7.2rem);
+  line-height: 0.92;
+  font-weight: 700;
+}
+
+.home-hero-line {
+  margin: 18px 0 0;
+  color: var(--accent);
+  font-size: clamp(1.35rem, 2.8vw, 2.1rem);
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.home-hero-copy {
+  max-width: 560px;
+  margin: 16px 0 0;
+  color: #3f4f69;
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.home-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.home-text-action {
+  color: #0a47d5;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(31, 93, 255, 0.35);
+  padding-bottom: 4px;
+}
+
+.home-philosophy,
+.program-rail,
+.forum-band,
+.admissions-path,
+.home-news {
+  padding-left: max(24px, calc((100vw - var(--max)) / 2 + 24px));
+  padding-right: max(24px, calc((100vw - var(--max)) / 2 + 24px));
+}
+
+.home-philosophy {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.6fr);
+  gap: clamp(28px, 5vw, 70px);
+  align-items: center;
+  padding-top: clamp(36px, 5vw, 58px);
+  padding-bottom: clamp(34px, 5vw, 54px);
+  border-bottom: 1px solid var(--line);
+}
+
+.home-section-title h2,
+.program-lead h2,
+.forum-copy h2,
+.admissions-path-title h2 {
+  margin: 0;
+  color: #071d43;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.home-section-title p,
+.program-lead p,
+.forum-copy p,
+.admissions-path-title p {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.home-section-title a,
+.program-lead a {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.principle-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.principle-row article {
+  min-width: 0;
+  border-left: 1px solid rgba(184, 138, 45, 0.46);
+  padding-left: 22px;
+}
+
+.principle-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+  margin-bottom: 12px;
+  color: #0b3d91;
+}
+
+.principle-icon svg {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.principle-row h3 {
+  margin: 0 0 8px;
+  color: #071d43;
+  font-size: 1rem;
+}
+
+.principle-row p {
+  margin: 0;
+  color: #596a84;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.program-rail {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.55fr) minmax(0, 1.7fr);
+  gap: clamp(28px, 5vw, 58px);
+  padding-top: clamp(36px, 5vw, 56px);
+  padding-bottom: clamp(36px, 5vw, 56px);
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, #061c42, #073269 58%, #062551);
+}
+
+.program-lead h2,
+.program-lead p {
+  color: #ffffff;
+}
+
+.program-lead p {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.program-lead a {
+  color: #f0bd4f;
+}
+
+.program-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+.program-list a {
+  display: grid;
+  gap: 9px;
+  min-height: 142px;
+  padding: 4px 22px 4px 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.35);
+  align-content: start;
+}
+
+.program-list span {
+  color: #f0bd4f;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.program-list strong {
+  color: #ffffff;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.program-list small {
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.55;
+}
+
+.forum-band {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(360px, 1fr) minmax(300px, 1.1fr);
+  gap: clamp(24px, 4vw, 50px);
+  align-items: center;
+  padding-top: clamp(34px, 5vw, 54px);
+  padding-bottom: clamp(34px, 5vw, 54px);
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.forum-copy .btn {
+  display: inline-block;
+  margin-top: 18px;
+  border-color: rgba(31, 93, 255, 0.34);
+  background: #ffffff;
+  color: var(--accent);
+}
+
+.forum-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(96px, 1fr));
+  gap: 16px;
+  border-left: 1px solid rgba(184, 138, 45, 0.45);
+  border-right: 1px solid rgba(184, 138, 45, 0.45);
+  padding: 0 22px;
+}
+
+.forum-stats div {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+}
+
+.forum-stats strong {
+  color: #0b3d91;
+  font-size: clamp(1.28rem, 1.9vw, 1.75rem);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.forum-stats span,
+.forum-topics span {
+  color: #677891;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.forum-stats span {
+  text-align: center;
+}
+
+.forum-topics {
+  display: grid;
+  gap: 12px;
+}
+
+.forum-topics a {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(214, 221, 232, 0.9);
+}
+
+.forum-topics a:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.forum-topics strong {
+  color: #071d43;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.admissions-path {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.48fr) minmax(0, 1.55fr) auto;
+  gap: clamp(22px, 4vw, 48px);
+  align-items: center;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #055dff, #0043c8);
+}
+
+.admissions-path-title h2,
+.admissions-path-title p {
+  color: #ffffff;
+}
+
+.admissions-path-title p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.admissions-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admissions-steps li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 12px;
+  row-gap: 3px;
+  padding: 4px 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.42);
+}
+
+.admissions-steps span {
+  grid-row: span 2;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.admissions-steps strong {
+  color: #ffffff;
+  font-size: 0.93rem;
+  line-height: 1.25;
+}
+
+.admissions-steps small {
+  color: rgba(255, 255, 255, 0.76);
+  line-height: 1.35;
+}
+
+.admissions-path .btn-outline {
+  min-width: 148px;
+  text-align: center;
+  background: #ffffff;
+  color: #0043c8;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
+.home-news {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.55fr) minmax(0, 1.45fr);
+  gap: clamp(26px, 5vw, 64px);
+  padding-top: clamp(40px, 6vw, 68px);
+  padding-bottom: clamp(42px, 6vw, 72px);
+  background: #ffffff;
+}
+
+.news-preview-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.news-preview-list a {
+  display: grid;
+  align-content: start;
+  min-height: 150px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(31, 93, 255, 0.04), rgba(255, 255, 255, 0)),
+    #ffffff;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.news-preview-list a:hover {
+  transform: translateY(-3px);
+  border-color: rgba(31, 93, 255, 0.28);
+  box-shadow: 0 18px 38px rgba(7, 29, 67, 0.08);
+}
+
+.news-preview-list span {
+  margin-bottom: 12px;
+  color: #6f7f96;
+  font-size: 0.82rem;
+}
+
+.news-preview-list strong {
+  color: #071d43;
+  line-height: 1.45;
+}
+
+@media (max-width: 1120px) {
+  .principle-row,
+  .program-list,
+  .admissions-steps,
+  .news-preview-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .forum-band,
+  .admissions-path {
+    grid-template-columns: 1fr;
+  }
+
+  .forum-stats {
+    border-right: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    gap: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .site-header > .btn {
+    white-space: nowrap;
+    padding: 9px 13px;
+    font-size: 0.84rem;
+  }
+
+  .home-hero {
+    min-height: clamp(500px, 78svh, 620px);
+  }
+
+  .home-hero-media {
+    background-image:
+      linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.93) 48%, rgba(255, 255, 255, 0.46) 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0) 72%, #ffffff 100%),
+      url("../img/wcu-campus-collaboration.png");
+    background-position: center right 34%;
+  }
+
+  .home-hero-content {
+    padding-top: 44px;
+    padding-bottom: 28px;
+  }
+
+  .home-hero h1 {
+    max-width: 10ch;
+    font-size: clamp(2.5rem, 13vw, 4.2rem);
+  }
+
+  .home-hero-copy {
+    max-width: 100%;
+  }
+
+  .home-philosophy,
+  .program-rail,
+  .home-news {
+    grid-template-columns: 1fr;
+  }
+
+  .principle-row,
+  .program-list,
+  .admissions-steps,
+  .news-preview-list {
+    grid-template-columns: 1fr;
+  }
+
+  .principle-row article,
+  .program-list a,
+  .admissions-steps li {
+    border-left: none;
+    border-top: 1px solid rgba(184, 138, 45, 0.36);
+    padding-left: 0;
+    padding-top: 18px;
+  }
+
+  .program-list a {
+    min-height: auto;
+    border-top-color: rgba(255, 255, 255, 0.28);
+  }
+
+  .forum-stats {
+    grid-template-columns: 1fr;
+    border-left: none;
+    border-top: 1px solid rgba(184, 138, 45, 0.45);
+    border-bottom: 1px solid rgba(184, 138, 45, 0.45);
+  }
+
+  .forum-stats div {
+    justify-items: start;
+    padding-left: 0;
+  }
+
+  .forum-stats span {
+    text-align: left;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer .footer-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: start;
+  }
+}
+
 .hero {
   min-height: 84vh;
   border-bottom: 1px solid var(--line);
@@ -330,6 +862,62 @@ section[id] {
 .section-header h2 {
   margin: 10px 0 0;
   font-size: clamp(1.5rem, 3.3vw, 2.5rem);
+}
+
+.forum-hero-action {
+  display: inline-block;
+  margin-top: 24px;
+}
+
+.forum-page-centered-action {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.forum-page-dark {
+  border-bottom: none;
+  background: linear-gradient(135deg, #061c42, #073269 58%, #062551);
+  color: #ffffff;
+}
+
+.forum-page-dark .eyebrow {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.forum-page-dark h2,
+.forum-page-dark h3 {
+  color: #ffffff;
+}
+
+.forum-page-benefits {
+  margin-top: 24px;
+}
+
+.forum-page-benefits .list-panel {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.forum-page-benefits ul {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.forum-page-start,
+.forum-page-start .section-header {
+  text-align: center;
+}
+
+.forum-page-start .section-header p:not(.eyebrow) {
+  max-width: 560px;
+  margin: 12px auto 0;
+}
+
+.forum-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 28px;
 }
 
 .pillars {
@@ -991,6 +1579,20 @@ section[id] {
   color: var(--muted);
 }
 
+.application-recaptcha {
+  display: none;
+  min-height: 78px;
+  overflow: hidden;
+}
+
+.application-recaptcha.is-enabled {
+  display: block;
+}
+
+.application-recaptcha > div {
+  max-width: 100%;
+}
+
 .form-note {
   margin: 0;
   font-size: 0.9rem;
@@ -1395,6 +1997,17 @@ section[id] {
 @media (max-width: 980px) {
   .application-step-bar {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .application-recaptcha {
+    min-height: 68px;
+  }
+
+  .application-recaptcha > div {
+    transform: scale(0.86);
+    transform-origin: left top;
   }
 }
 

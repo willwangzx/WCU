@@ -30,4 +30,14 @@ return [
         'password_hash' => 'replace-with-password-hash',
         'session_name' => 'wcu_admin_session',
     ],
+    'recaptcha' => [
+        'enabled' => false,
+        'secret_key_env' => 'WCU_RECAPTCHA_SECRET_KEY',
+        'allowed_hostnames' => [
+            'wcuedu.net',
+            'www.wcuedu.net',
+        ],
+        'minimum_score' => null,
+        'expected_action' => '',
+    ],
 ];

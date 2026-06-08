@@ -1,0 +1,42 @@
+server.modules = (
+  "mod_access",
+  "mod_alias",
+  "mod_proxy",
+  "mod_redirect"
+)
+
+server.document-root = "/var/www/wcu-site"
+server.port = 80
+server.bind = "0.0.0.0"
+
+server.errorlog = "/var/log/lighttpd/wcu-front-error.log"
+accesslog.filename = "/var/log/lighttpd/wcu-front-access.log"
+
+server.follow-symlink = "enable"
+server.dir-listing = "disable"
+
+server.max-read-idle = 15
+server.max-write-idle = 15
+server.max-keep-alive-idle = 15
+server.max-keep-alive-requests = 100
+
+alias.url = (
+  "/assets/" => "/var/www/wcu-site/assets/",
+  "/pages/" => "/var/www/wcu-site/pages/"
+)
+
+$HTTP["url"] =~ "^/api/" {
+  proxy.server = (
+    "" => (("host" => "161.153.87.137", "port" => 80))
+  )
+}
+
+$HTTP["url"] =~ "^/admin/" {
+  proxy.server = (
+    "" => (("host" => "161.153.87.137", "port" => 80))
+  )
+}
+
+url.redirect = (
+  "^/$" => "/index.html"
+)

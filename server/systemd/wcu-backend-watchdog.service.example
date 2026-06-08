@@ -1,0 +1,9 @@
+[Unit]
+Description=WCU backend watchdog
+
+[Service]
+Type=oneshot
+Environment=WCU_HEALTHCHECK_URL=http://127.0.0.1:8080/api/application.php
+Environment=WCU_HEALTHCHECK_SERVICE=wcu-backend
+Environment=WCU_HEALTHCHECK_MAX_TIME=5
+ExecStart=/usr/local/bin/wcu-backend-healthcheck.sh

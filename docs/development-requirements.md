@@ -11,6 +11,23 @@ commands change.
 - PowerShell on Windows
 - WSL2 with Ubuntu 24.04 for Windows contributors
 
+Use `docs/wsl-local-server-development.md` for the full local server guide
+when simulating the production stack in WSL.
+
+## Branch And Verification Requirements
+
+- Use a topic branch for every non-trivial change.
+- Create the topic branch from the intended integration branch, keep commits
+  focused, and merge back only after local verification passes.
+- For forum work, the intended integration branch is `forum`. Update `forum`,
+  create a fresh topic branch from it, test with the local WSL forum server,
+  then merge the verified topic branch back into `forum`.
+- Do not merge runtime-affecting changes until the relevant local target has
+  been checked:
+  - Static site and admissions edge: `http://localhost:8088`
+  - Admissions backend direct target: `http://127.0.0.1:8080`
+  - WordPress/wpForo forum: `http://localhost:8081/community/`
+
 ## Static Site Requirements
 
 - Install Node.js and npm.
@@ -34,6 +51,10 @@ commands change.
 - Use `server/config.python.example.json` as the template for local Python
   backend config.
 - Keep real API keys and admin credentials outside git.
+- Leave `window.WCU_CONFIG.recaptchaSiteKey` empty for normal local form
+  testing. To test Google reCAPTCHA, place only the public site key in
+  `assets/js/site-config.js` and set the backend secret with
+  `WCU_RECAPTCHA_SECRET_KEY` or the local untracked backend config.
 - Legacy PHP backend files remain in the repo for reference and overlap checks,
   but production currently uses Python plus SQLite.
 
@@ -74,6 +95,71 @@ Current local direct-install convention:
 
 The credential file is machine-local and must not be committed.
 
+Forum development branch flow:
+
+```powershell
+git switch forum
+git pull --ff-only
+git switch -c feature/forum-short-description
+```
+
+Make source changes in the repo branch, sync or install them into the WSL forum
+as needed, verify `http://localhost:8081/community/`, then merge the topic
+branch back into `forum` only after the local forum check passes.
+
+Production forum deployment uses the current VM rather than a managed
+WordPress host:
+
+- Production WordPress root: `/var/www/wcu-forum`
+- Production forum URL: `https://forum.wcuedu.net/community/`
+- Production database: MySQL database `wcu_forum`
+- Production secret file: `/root/.wcu-forum-prod.env`
+- Production nginx config: `/etc/nginx/sites-available/wcu-forum`
+
+Production deployment artifacts:
+
+- `server/scripts/install-wordpress-forum.sh`
+- `server/scripts/seed-wpforo-forum.php`
+- `server/config/nginx-forum.conf.example`
+- `server/wordpress/themes/wcu-forum/`
+- `server/wordpress/mu-plugins/wcu-forum-smtp.php`
+
+Production forum mail is configured through `/root/.wcu-forum-prod.env` and
+then written by the installer to local `wp-config.php` constants. Keep the real
+values outside git:
+
+- `WCU_FORUM_SMTP_HOST`
+- `WCU_FORUM_SMTP_PORT` defaults to `587`
+- `WCU_FORUM_SMTP_SECURE` defaults to `tls`
+- `WCU_FORUM_SMTP_USER`
+- `WCU_FORUM_SMTP_PASSWORD`
+- `WCU_FORUM_MAIL_FROM` defaults to `noreply@wcuedu.net`
+- `WCU_FORUM_MAIL_FROM_NAME` defaults to `William Chichi University Forum`
+
+Production forum reCAPTCHA is configured through the same untracked env file
+and seeded into wpForo's built-in `wpforo_recaptcha` option. Keep the secret
+outside git:
+
+- `WCU_FORUM_RECAPTCHA_SITE_KEY`
+- `WCU_FORUM_RECAPTCHA_SECRET_KEY`
+- `WCU_FORUM_RECAPTCHA_THEME` defaults to `light`
+- `WCU_FORUM_RECAPTCHA_VERSION` defaults to `v2_checkbox`
+- `WCU_FORUM_RECAPTCHA_SCORE_THRESHOLD` defaults to `0.5` for v3-compatible
+  wpForo versions
+
+Run the production installer on the VM as `root` after copying the scripts:
+
+```bash
+bash /root/wcu-forum-install/install-wordpress-forum.sh
+```
+
+The installer is intended to be idempotent. It installs the package stack,
+creates WordPress config from `/root/.wcu-forum-prod.env`, installs wpForo,
+creates the `/community/` page, installs the WCU child theme and SMTP MU
+plugin, enables wpForo email confirmation for registration, seeds the forum
+structure through wpForo APIs, writes the forum nginx site, validates nginx, and
+reloads nginx.
+
 ## Verification Commands
 
 From PowerShell:
@@ -84,6 +170,8 @@ wsl -d Ubuntu-24.04 -- bash -lc "composer --version"
 wsl -d Ubuntu-24.04 -- bash -lc "wp --info | head -n8"
 wsl -d Ubuntu-24.04 -- bash -lc "systemctl is-active apache2; systemctl is-active mysql"
 wsl -d Ubuntu-24.04 -- bash -lc "cd /var/www/wcu-forum && wp core version && wp plugin status wpforo"
+wsl -d Ubuntu-24.04 -- bash -lc "wp --path=/var/www/wcu-forum theme list --allow-root | grep wcu-forum"
+wsl -d Ubuntu-24.04 -- bash -lc "wp --path=/var/www/wcu-forum eval-file /mnt/c/path/to/WCU/server/scripts/seed-wpforo-forum.php"
 curl.exe -I http://localhost:8081/community/
 ```
 
@@ -93,9 +181,12 @@ same way as `localhost`.
 ## Service Ports
 
 - Static preview: chosen by `scripts/serve-site.ps1`.
+- WSL local nginx edge: `localhost:8088`.
 - Admissions backend: `127.0.0.1:8080`.
 - WordPress/wpForo local development: `localhost:8081`.
 - Production HTTP/HTTPS: `80` and `443` behind Cloudflare.
+- Production MySQL: `127.0.0.1:3306` only.
+- Production PHP-FPM: `/run/php/php8.3-fpm.sock`.
 
 ## Updating Requirements
 

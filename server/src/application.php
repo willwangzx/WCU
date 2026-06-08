@@ -174,6 +174,110 @@ function validate_application_payload(array $application): array
     return $errors;
 }
 
+function recaptcha_config(): array
+{
+    $config = load_config()['recaptcha'] ?? [];
+    return is_array($config) ? $config : [];
+}
+
+function recaptcha_secret_key(): string
+{
+    $config = recaptcha_config();
+    $envName = trim((string) ($config['secret_key_env'] ?? 'WCU_RECAPTCHA_SECRET_KEY'));
+    $envSecret = $envName !== '' ? getenv($envName) : false;
+
+    return trim((string) ($envSecret !== false && $envSecret !== '' ? $envSecret : ($config['secret_key'] ?? '')));
+}
+
+function recaptcha_is_enabled(): bool
+{
+    $config = recaptcha_config();
+
+    return ($config['enabled'] ?? false) === true || recaptcha_secret_key() !== '';
+}
+
+function recaptcha_token_from_payload(array $payload): string
+{
+    return trim((string) first_present_value($payload, ['recaptcha_token', 'g-recaptcha-response', 'g_recaptcha_response']));
+}
+
+function recaptcha_verification_errors(array $payload): array
+{
+    if (!recaptcha_is_enabled()) {
+        return [];
+    }
+
+    $secretKey = recaptcha_secret_key();
+    if ($secretKey === '') {
+        return ['reCAPTCHA protection is not configured.'];
+    }
+
+    $token = recaptcha_token_from_payload($payload);
+    if ($token === '') {
+        return ['Please complete the reCAPTCHA challenge.'];
+    }
+
+    $config = recaptcha_config();
+    $verifyUrl = trim((string) ($config['verify_url'] ?? 'https://www.google.com/recaptcha/api/siteverify'));
+    $requestPayload = [
+        'secret' => $secretKey,
+        'response' => $token,
+    ];
+
+    if (!empty($_SERVER['REMOTE_ADDR'])) {
+        $requestPayload['remoteip'] = (string) $_SERVER['REMOTE_ADDR'];
+    }
+
+    $timeoutSeconds = (float) ($config['timeout_seconds'] ?? 5);
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+            'content' => http_build_query($requestPayload),
+            'timeout' => $timeoutSeconds > 0 ? $timeoutSeconds : 5,
+            'ignore_errors' => true,
+        ],
+    ]);
+    $rawResponse = @file_get_contents($verifyUrl, false, $context);
+
+    if ($rawResponse === false || trim($rawResponse) === '') {
+        return ['Unable to verify reCAPTCHA right now. Please try again.'];
+    }
+
+    $result = json_decode($rawResponse, true);
+    if (!is_array($result) || ($result['success'] ?? false) !== true) {
+        return ['reCAPTCHA verification failed. Please try again.'];
+    }
+
+    $allowedHostnames = array_values(array_filter(array_map(
+        static fn (mixed $hostname): string => strtolower(trim((string) $hostname)),
+        is_array($config['allowed_hostnames'] ?? null) ? $config['allowed_hostnames'] : []
+    )));
+    $responseHostname = strtolower(trim((string) ($result['hostname'] ?? '')));
+    if ($allowedHostnames !== [] && !in_array($responseHostname, $allowedHostnames, true)) {
+        return ['reCAPTCHA verification failed for this site.'];
+    }
+
+    $expectedAction = trim((string) ($config['expected_action'] ?? ''));
+    if ($expectedAction !== '' && trim((string) ($result['action'] ?? '')) !== $expectedAction) {
+        return ['reCAPTCHA verification failed for this action.'];
+    }
+
+    $minimumScore = $config['minimum_score'] ?? null;
+    if ($minimumScore !== null && array_key_exists('score', $result)) {
+        $score = filter_var($result['score'], FILTER_VALIDATE_FLOAT);
+        $requiredScore = filter_var($minimumScore, FILTER_VALIDATE_FLOAT);
+        if ($score === false || $requiredScore === false) {
+            return ['reCAPTCHA verification returned an invalid score.'];
+        }
+        if ($score < $requiredScore) {
+            return ['reCAPTCHA verification score was too low.'];
+        }
+    }
+
+    return [];
+}
+
 function insert_application(PDO $pdo, array $application): int
 {
     $statement = $pdo->prepare(
@@ -245,6 +349,23 @@ function insert_application(PDO $pdo, array $application): int
     return (int) $pdo->lastInsertId();
 }
 
+function sanitize_mail_header_value(string $value): string
+{
+    return trim(str_replace(["\r", "\n"], '', $value));
+}
+
+function format_mailbox_header(string $name, string $address): string
+{
+    $safeName = sanitize_mail_header_value($name);
+    $safeAddress = sanitize_mail_header_value($address);
+
+    if ($safeName === '') {
+        return $safeAddress;
+    }
+
+    return str_replace(['\\', '"'], ['\\\\', '\\"'], $safeName) . ' <' . $safeAddress . '>';
+}
+
 function maybe_send_confirmation_email(array $application): bool
 {
     $email = load_config()['email'] ?? [];
@@ -262,11 +383,22 @@ function maybe_send_confirmation_email(array $application): bool
     $message .= "Best regards,\n";
     $message .= ($email['from_name'] ?? 'WCU Admissions Office');
 
+    $fromName = (string) ($email['from_name'] ?? 'WCU Admissions Office');
+    $fromAddress = sanitize_mail_header_value((string) ($email['from_address'] ?? ''));
+    $adminAddress = sanitize_mail_header_value((string) ($email['admin'] ?? ''));
     $headers = [
-        'From: ' . ($email['from_name'] ?? 'WCU Admissions Office') . ' <' . ($email['from_address'] ?? '') . '>',
-        'Reply-To: ' . ($email['admin'] ?? ''),
         'X-Mailer: PHP/' . phpversion(),
     ];
+
+    if (filter_var($fromAddress, FILTER_VALIDATE_EMAIL)) {
+        array_unshift($headers, 'From: ' . format_mailbox_header($fromName, $fromAddress));
+    } elseif (filter_var($adminAddress, FILTER_VALIDATE_EMAIL)) {
+        array_unshift($headers, 'From: ' . format_mailbox_header($fromName, $adminAddress));
+    }
+
+    if (filter_var($adminAddress, FILTER_VALIDATE_EMAIL)) {
+        $headers[] = 'Reply-To: ' . $adminAddress;
+    }
 
     return mail($to, $subject, $message, implode("\r\n", $headers));
 }

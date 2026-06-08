@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "color": {
+      "palette": [
+        { "slug": "wcu-text", "color": "#0b1f3a", "name": "WCU Text" },
+        { "slug": "wcu-muted", "color": "#44556d", "name": "WCU Muted" },
+        { "slug": "wcu-accent", "color": "#1f5dff", "name": "WCU Accent" },
+        { "slug": "wcu-gold", "color": "#b88a2d", "name": "WCU Gold" },
+        { "slug": "wcu-bg", "color": "#f7f8fb", "name": "WCU Background" },
+        { "slug": "wcu-surface", "color": "#ffffff", "name": "WCU Surface" }
+      ]
+    },
+    "layout": {
+      "contentSize": "1180px",
+      "wideSize": "1180px"
+    },
+    "typography": {
+      "fontFamilies": [
+        {
+          "fontFamily": "\"Inter\", \"Segoe UI\", sans-serif",
+          "slug": "inter",
+          "name": "Inter"
+        },
+        {
+          "fontFamily": "\"Playfair Display\", Georgia, serif",
+          "slug": "playfair-display",
+          "name": "Playfair Display"
+        }
+      ]
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#ffffff",
+      "text": "#0b1f3a"
+    },
+    "typography": {
+      "fontFamily": "\"Inter\", \"Segoe UI\", sans-serif",
+      "lineHeight": "1.6"
+    }
+  }
+}

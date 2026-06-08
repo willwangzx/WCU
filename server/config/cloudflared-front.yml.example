@@ -1,0 +1,16 @@
+# Single-node Cloudflare Tunnel example for the current WCU deployment.
+# The local Python service serves the static site, /api, and /admin together.
+tunnel: REPLACE_WITH_TUNNEL_UUID
+credentials-file: /etc/cloudflared/REPLACE_WITH_TUNNEL_UUID.json
+
+ingress:
+  - hostname: wcuedu.net
+    service: http://127.0.0.1:8080
+
+  - hostname: www.wcuedu.net
+    service: http://127.0.0.1:8080
+
+  - hostname: api.wcuedu.net
+    service: http://127.0.0.1:8080
+
+  - service: http_status:404

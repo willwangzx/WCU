@@ -14,11 +14,15 @@ $configError = admin_credentials_configured()
     : 'Admin access is not configured yet. Add admin.username and admin.password_hash to server/config.php.';
 
 if ($requestMethod === 'POST' && $action === 'login') {
+    $submittedUsername = (string) ($_POST['username'] ?? '');
+
     if (!validate_csrf_token($_POST['csrf_token'] ?? null)) {
         $loginError = 'Your session expired. Please try signing in again.';
     } elseif ($configError !== '') {
         $loginError = $configError;
-    } elseif (attempt_admin_login((string) ($_POST['username'] ?? ''), (string) ($_POST['password'] ?? ''))) {
+    } elseif (admin_login_is_locked($submittedUsername)) {
+        $loginError = 'Too many incorrect sign-in attempts. Please wait 15 minutes and try again.';
+    } elseif (attempt_admin_login($submittedUsername, (string) ($_POST['password'] ?? ''))) {
         header('Location: ' . admin_url());
         exit;
     } else {
@@ -66,6 +70,12 @@ if ($action === 'export') {
     }
 
     $filters = normalize_admin_filters($_GET);
+    if (!validate_csrf_token($_GET['csrf_token'] ?? null)) {
+        set_admin_flash('error', 'Export request expired. Please use the dashboard export button.');
+        header('Location: ' . admin_url(array_filter($filters, static fn (string $value): bool => $value !== '')));
+        exit;
+    }
+
     stream_applications_csv(get_database_connection(), $filters);
 }
 
@@ -556,7 +566,7 @@ function filter_query_with_application(array $filters, int $applicationId): arra
           <div class="filter-actions">
             <button class="button" type="submit">Apply filters</button>
             <a class="ghost-button" href="<?php echo escape_html(admin_url()); ?>">Reset</a>
-            <a class="ghost-button" href="<?php echo escape_html(admin_url(array_merge(array_filter($filters, static fn (string $value): bool => $value !== ''), ['action' => 'export']))); ?>">Export CSV</a>
+            <a class="ghost-button" href="<?php echo escape_html(admin_url(array_merge(array_filter($filters, static fn (string $value): bool => $value !== ''), ['action' => 'export', 'csrf_token' => $csrfToken]))); ?>">Export CSV</a>
           </div>
         </form>
 
@@ -597,7 +607,7 @@ function filter_query_with_application(array $filters, int $applicationId): arra
               </div>
               <div class="detail-actions">
                 <a class="button" href="mailto:<?php echo escape_html($selectedApplication['email']); ?>">Email applicant</a>
-                <a class="ghost-button" href="<?php echo escape_html($selectedApplication['portfolio_url']); ?>" target="_blank" rel="noreferrer">Open portfolio</a>
+                <a class="ghost-button" href="<?php echo escape_html($selectedApplication['portfolio_url']); ?>" target="_blank" rel="noopener noreferrer">Open portfolio</a>
                 <form method="post" action="<?php echo escape_html(admin_url()); ?>" onsubmit="return confirm('Delete application #<?php echo escape_html((string) $selectedApplication['id']); ?>? This cannot be undone.');">
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="csrf_token" value="<?php echo escape_html($csrfToken); ?>">

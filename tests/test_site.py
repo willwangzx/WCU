@@ -7,6 +7,8 @@ import unittest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+PUBLIC_FORUM_URL = "https://forum.wcuedu.net/community/"
+PUBLIC_LOGIC_LAB_URL = "https://forum.wcuedu.net/tools/logic-lab/"
 
 KEY_PAGES = [
     REPO_ROOT / "index.html",
@@ -23,6 +25,19 @@ KEY_ASSETS = [
     REPO_ROOT / "assets" / "css" / "styles.css",
     REPO_ROOT / "assets" / "js" / "script.js",
     REPO_ROOT / "assets" / "js" / "site-config.js",
+]
+
+FORUM_ENTRANCE_PAGE = REPO_ROOT / "pages" / "forum.html"
+FORUM_DEPLOYMENT_ARTIFACTS = [
+    REPO_ROOT / "server" / "scripts" / "install-wordpress-forum.sh",
+    REPO_ROOT / "server" / "scripts" / "seed-wpforo-forum.php",
+    REPO_ROOT / "server" / "config" / "nginx-forum.conf.example",
+    REPO_ROOT / "server" / "wordpress" / "mu-plugins" / "wcu-forum-smtp.php",
+    REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "style.css",
+    REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "functions.php",
+    REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "templates" / "page.html",
+    REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "parts" / "header.html",
+    REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "assets" / "css" / "wcu-forum.css",
 ]
 
 EXPECTED_BASIC_FIELDS = [
@@ -144,6 +159,74 @@ class SiteSmokeTests(unittest.TestCase):
                         ),
                     )
 
+    def test_homepage_forum_links_to_entrance_page(self) -> None:
+        homepage = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn('href="pages/forum.html"', homepage)
+        self.assertNotIn('href="#forum"', homepage)
+
+        for fake_count in ("12K+", "850+", "120+"):
+            with self.subTest(fake_count=fake_count):
+                self.assertNotIn(fake_count, homepage)
+
+    def test_forum_entrance_page_exists(self) -> None:
+        self.assertTrue(FORUM_ENTRANCE_PAGE.exists(), "Missing forum entrance page")
+        forum_page = FORUM_ENTRANCE_PAGE.read_text(encoding="utf-8")
+        self.assertIn(PUBLIC_FORUM_URL, forum_page)
+        self.assertIn("Student Forum", forum_page)
+        self.assertIn("Enter the Forum", forum_page)
+        self.assertNotIn("style=", forum_page)
+        self.assertNotIn("\ufffd", forum_page)
+        self.assertNotIn("鈥", forum_page)
+
+    def test_forum_entrance_page_in_navigation(self) -> None:
+        for page in KEY_PAGES:
+            with self.subTest(page=page.relative_to(REPO_ROOT).as_posix()):
+                content = page.read_text(encoding="utf-8")
+                self.assertIn(
+                    'forum.html',
+                    content,
+                    f"{page.relative_to(REPO_ROOT)} is missing a link to forum.html",
+                )
+
+    def test_forum_deployment_artifacts_exist(self) -> None:
+        for artifact in FORUM_DEPLOYMENT_ARTIFACTS:
+            with self.subTest(artifact=artifact.relative_to(REPO_ROOT).as_posix()):
+                self.assertTrue(artifact.exists(), f"Missing forum deployment artifact: {artifact}")
+
+    def test_forum_installer_configures_verification_and_theme(self) -> None:
+        installer = (REPO_ROOT / "server" / "scripts" / "install-wordpress-forum.sh").read_text(encoding="utf-8")
+        seeder = (REPO_ROOT / "server" / "scripts" / "seed-wpforo-forum.php").read_text(encoding="utf-8")
+        nginx_config = (REPO_ROOT / "server" / "config" / "nginx-forum.conf.example").read_text(encoding="utf-8")
+        smtp_plugin = (REPO_ROOT / "server" / "wordpress" / "mu-plugins" / "wcu-forum-smtp.php").read_text(encoding="utf-8")
+        theme_css = (REPO_ROOT / "server" / "wordpress" / "themes" / "wcu-forum" / "assets" / "css" / "wcu-forum.css").read_text(encoding="utf-8")
+
+        for expected in (
+            "WCU_FORUM_SMTP_HOST",
+            "WCU_FORUM_SMTP_PASSWORD",
+            "WCU_FORUM_RECAPTCHA_SITE_KEY",
+            "WCU_FORUM_RECAPTCHA_SECRET_KEY",
+            "wp-content/mu-plugins/wcu-forum-smtp.php",
+            "wp theme activate",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, installer)
+
+        self.assertIn("'user_register_email_confirm'] = 1", seeder)
+        self.assertIn("'manually_approval'] = 0", seeder)
+        self.assertIn("wpforo_recaptcha", seeder)
+        self.assertIn("wcu_forum_update_recaptcha_settings", seeder)
+        self.assertIn("Fun & Useful Tools", seeder)
+        self.assertIn("fun-useful-tools", seeder)
+        self.assertIn(PUBLIC_LOGIC_LAB_URL, seeder)
+        self.assertIn("location ^~ /tools/logic-lab/", installer)
+        self.assertIn("location ^~ /tools/logic-lab/assets/", installer)
+        self.assertIn("location ^~ /tools/logic-lab/", nginx_config)
+        self.assertIn("location ^~ /tools/logic-lab/assets/", nginx_config)
+        self.assertIn("phpmailer_init", smtp_plugin)
+        self.assertIn("wcu-site-header", theme_css)
+        self.assertIn("#wpforo #wpforo-wrap", theme_css)
+
     def test_application_entry_page_points_to_split_flow(self) -> None:
         apply_page = (REPO_ROOT / "pages" / "apply.html").read_text(encoding="utf-8")
         self.assertIn('href="apply-basic.html"', apply_page)
@@ -162,6 +245,7 @@ class SiteSmokeTests(unittest.TestCase):
         self.assertIn('id="writingMaterialsForm"', writing_page)
         self.assertIn('action="../api/application.php"', writing_page)
         self.assertIn('id="applicationMessage"', writing_page)
+        self.assertIn('id="applicationRecaptcha"', writing_page)
         self.assertIn('src="../assets/js/site-config.js"', writing_page)
 
         for field in EXPECTED_WRITING_FIELDS:

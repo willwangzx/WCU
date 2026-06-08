@@ -18,6 +18,8 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 |-- assets/
 |   |-- css/
 |   |   `-- styles.css
+|   |-- img/
+|   |   `-- wcu-campus-collaboration.png
 |   `-- js/
 |       `-- script.js
 |-- docs/
@@ -44,6 +46,7 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 - Further management in improving the website and adding new features is tracked in the white paper.
 - [Project Mind Map](docs/mindmap.md)
 - [Current Production Deployment](docs/current-deployment.md)
+- [UI Design Patterns](docs/ui-design-patterns.md)
 - [服务器配置说明](docs/server-configuration.md)
 - [Cloudflare Tunnel 部署说明（历史/备用）](docs/cloudflare-tunnel-deployment.md)
 
@@ -51,9 +54,11 @@ William Chi-Chi University strives to create an open, dynamic, and intellectuall
 
 - `index.html` remains at the repo root as the main entry page.
 - Shared styles and scripts now live under `assets/`.
+- Shared image assets now live under `assets/img/`.
 - General content pages now live under `pages/`.
 - School detail pages now live under `pages/schools/`.
 - `docs/` stores non-deploy materials such as planning notes and white papers.
+- Website visual design patterns are recorded in `docs/ui-design-patterns.md`.
 - Internal links and asset paths were updated to match the new layout.
 
 ## Deployment

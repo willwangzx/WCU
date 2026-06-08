@@ -1,0 +1,4 @@
+[Service]
+Environment=WCU_BIND_HOST=127.0.0.1
+Environment=WCU_BIND_PORT=8080
+Environment=WCU_STATIC_ROOT=/srv/wcu-site

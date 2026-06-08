@@ -29,12 +29,21 @@ if ($method !== 'POST') {
     ]);
 }
 
-$application = normalize_application_payload(read_request_payload());
+$payload = read_request_payload();
+$application = normalize_application_payload($payload);
 
 if ($application['honeypot'] !== '') {
     respond_json(400, [
         'ok' => false,
         'errors' => ['Spam detected.'],
+    ]);
+}
+
+$recaptchaErrors = recaptcha_verification_errors($payload);
+if ($recaptchaErrors !== []) {
+    respond_json(400, [
+        'ok' => false,
+        'errors' => $recaptchaErrors,
     ]);
 }
 

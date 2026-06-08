@@ -11,6 +11,16 @@
   },
   "admin": {
     "username": "admin",
-    "password_hash": "sha256$replace-with-sha256-hex-of-your-password"
+    "password_hash": "scrypt$32768$8$1$replace-with-salt-hex$replace-with-scrypt-hex"
+  },
+  "recaptcha": {
+    "enabled": false,
+    "secret_key_env": "WCU_RECAPTCHA_SECRET_KEY",
+    "allowed_hostnames": [
+      "wcuedu.net",
+      "www.wcuedu.net"
+    ],
+    "minimum_score": null,
+    "expected_action": ""
   }
 }

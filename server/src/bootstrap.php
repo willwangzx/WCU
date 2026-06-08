@@ -35,6 +35,16 @@ function load_config(): array
             'password_hash' => '',
             'session_name' => 'wcu_admin_session',
         ],
+        'recaptcha' => [
+            'enabled' => false,
+            'secret_key' => '',
+            'secret_key_env' => 'WCU_RECAPTCHA_SECRET_KEY',
+            'verify_url' => 'https://www.google.com/recaptcha/api/siteverify',
+            'timeout_seconds' => 5,
+            'allowed_hostnames' => [],
+            'minimum_score' => null,
+            'expected_action' => '',
+        ],
     ];
 
     $configFile = dirname(__DIR__) . '/config.php';

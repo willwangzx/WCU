@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/application.php';
 
+const ADMIN_LOGIN_MAX_FAILURES = 5;
+const ADMIN_LOGIN_WINDOW_SECONDS = 900;
+
 function get_admin_config(): array
 {
     $admin = load_config()['admin'] ?? [];
@@ -89,6 +92,73 @@ function validate_csrf_token(?string $token): bool
     return $expected !== '' && is_string($token) && hash_equals($expected, $token);
 }
 
+function admin_login_attempts_directory(): string
+{
+    return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'wcu-admin-login-attempts';
+}
+
+function admin_login_attempts_file(string $username): string
+{
+    $clientIp = (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+    $identifier = hash('sha256', strtolower(trim($username)) . '|' . $clientIp);
+    return admin_login_attempts_directory() . DIRECTORY_SEPARATOR . $identifier . '.json';
+}
+
+function read_admin_login_failures(string $username): array
+{
+    $file = admin_login_attempts_file($username);
+    if (!is_file($file)) {
+        return [];
+    }
+
+    $decoded = json_decode((string) file_get_contents($file), true);
+    if (!is_array($decoded)) {
+        return [];
+    }
+
+    $cutoff = time() - ADMIN_LOGIN_WINDOW_SECONDS;
+    return array_values(array_filter(
+        $decoded,
+        static fn (mixed $value): bool => is_int($value) && $value >= $cutoff
+    ));
+}
+
+function write_admin_login_failures(string $username, array $failures): void
+{
+    $directory = admin_login_attempts_directory();
+    if (!is_dir($directory)) {
+        @mkdir($directory, 0700, true);
+    }
+
+    if (!is_dir($directory)) {
+        return;
+    }
+
+    @file_put_contents(admin_login_attempts_file($username), json_encode(array_values($failures)), LOCK_EX);
+}
+
+function admin_login_is_locked(string $username): bool
+{
+    $failures = read_admin_login_failures($username);
+    write_admin_login_failures($username, $failures);
+    return count($failures) >= ADMIN_LOGIN_MAX_FAILURES;
+}
+
+function record_admin_login_failure(string $username): void
+{
+    $failures = read_admin_login_failures($username);
+    $failures[] = time();
+    write_admin_login_failures($username, $failures);
+}
+
+function clear_admin_login_failures(string $username): void
+{
+    $file = admin_login_attempts_file($username);
+    if (is_file($file)) {
+        @unlink($file);
+    }
+}
+
 function is_admin_authenticated(): bool
 {
     start_admin_session();
@@ -100,18 +170,24 @@ function attempt_admin_login(string $username, string $password): bool
     start_admin_session();
 
     $config = get_admin_config();
+    $normalizedUsername = trim($username);
     if (!admin_credentials_configured()) {
         return false;
     }
 
-    if (!hash_equals($config['username'], trim($username))) {
+    if (admin_login_is_locked($normalizedUsername)) {
         return false;
     }
 
-    if (!password_verify($password, $config['password_hash'])) {
+    $usernameMatches = hash_equals($config['username'], $normalizedUsername);
+    $passwordMatches = password_verify($password, $config['password_hash']);
+
+    if (!$usernameMatches || !$passwordMatches) {
+        record_admin_login_failure($normalizedUsername);
         return false;
     }
 
+    clear_admin_login_failures($normalizedUsername);
     session_regenerate_id(true);
     $_SESSION['admin_authenticated'] = true;
     $_SESSION['admin_username'] = $config['username'];

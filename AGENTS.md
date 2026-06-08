@@ -30,6 +30,9 @@ or security posture changes.
 - Current deployment docs: `docs/current-deployment.md`.
 - Team development structure: `docs/development-structure.md`.
 - Team development requirements: `docs/development-requirements.md`.
+- WSL local server development guide:
+  `docs/wsl-local-server-development.md`.
+- Website UI and visual design patterns: `docs/ui-design-patterns.md`.
 - Historical/alternative deployment docs: `docs/cloudflare-tunnel-deployment.md`,
   `docs/server-configuration.md`, and `server/README.md`.
 
@@ -40,7 +43,11 @@ or security posture changes.
   and agents.
 - Before editing, check `git status --short --branch` and avoid overwriting
   files with unrelated local changes.
-- Keep work on a branch and keep each commit focused on one logical change.
+- Keep work on a topic branch created from the intended integration branch, and
+  keep each commit focused on one logical change.
+- For forum work, use `forum` as the integration branch: update `forum`, create
+  a new topic branch from it, test with the local WSL WordPress/wpForo server,
+  then merge the tested topic branch back into `forum`.
 - Do not reformat, rename, move, or delete unrelated files while doing a scoped
   task.
 - If another person's change touches the same file, read the file carefully and
@@ -51,6 +58,8 @@ or security posture changes.
   boundaries, generated outputs, or local-only areas change.
 - Update `docs/development-requirements.md` when required tools, versions,
   service ports, local setup commands, or development URLs change.
+- Update `docs/ui-design-patterns.md` when reusable UI patterns, visual tokens,
+  homepage section patterns, or asset rules change.
 - Never commit machine-local credentials, database dumps with real data, SSH
   keys, API keys, WordPress admin passwords, or local config files.
 
@@ -59,6 +68,8 @@ or security posture changes.
 - Build static output: `npm run build`.
 - Run local smoke tests: `.\scripts\run-tests.ps1`.
 - Start local preview: `.\scripts\serve-site.ps1`.
+- Simulate the production-like local server in WSL:
+  `docs/wsl-local-server-development.md`.
 - Verify local WordPress/wpForo forum:
   ```powershell
   curl.exe -I http://localhost:8081/community/
@@ -69,24 +80,42 @@ or security posture changes.
 - Current production VM public IP: `178.238.234.111`.
 - Previous Oracle VM public IP: `161.153.87.137` (old backend fallback only; do
   not route production traffic there).
-- Public site domains: `wcuedu.net`, `www.wcuedu.net`, `api.wcuedu.net`.
+- Public site domains: `wcuedu.net`, `www.wcuedu.net`, `api.wcuedu.net`,
+  `forum.wcuedu.net`.
 - DNS mode: Cloudflare proxied A records directly to `178.238.234.111`
   (B方案). Cloudflare Tunnel is not part of the current production path.
 - Frontend document root: `/srv/wcu-site`.
 - Backend app directory: `/opt/wcu-backend`.
 - SQLite data directory: `/var/lib/wcu-data`.
 - Backend public paths: `/api` and `/admin`.
+- Production WordPress/wpForo forum root: `/var/www/wcu-forum`.
+- Production WordPress/wpForo forum URL:
+  `https://forum.wcuedu.net/community/`.
+- Production forum tool URL: `https://forum.wcuedu.net/tools/logic-lab/`.
+- Production forum tool root: `/var/www/wcu-forum/tools/logic-lab`.
+- Production forum database: MySQL database `wcu_forum`.
+- Production forum secrets: `/root/.wcu-forum-prod.env`.
+- Forum theme source: `server/wordpress/themes/wcu-forum/`.
+- Forum SMTP MU plugin source:
+  `server/wordpress/mu-plugins/wcu-forum-smtp.php`.
 - Local backend target: `http://127.0.0.1:8080`.
+- Local WSL nginx edge target: `http://localhost:8088`.
 - Local WordPress/wpForo development target: `http://localhost:8081/community/`
   with files at `/var/www/wcu-forum` inside WSL.
-- Public edge: `nginx` listens on `80` and `443`, serves the static site, and
-  reverse proxies `/api` and `/admin` to `127.0.0.1:8080`.
+- Public edge: `nginx` listens on `80` and `443`, serves the static site,
+  reverse proxies `/api` and `/admin` to `127.0.0.1:8080`, and serves
+  `forum.wcuedu.net` from WordPress via PHP-FPM.
 - Systemd services:
   - `nginx`: active/enabled.
   - `wcu-backend`: active/enabled and running as the dedicated `wcu` user.
+  - `mysql`: active/enabled for the production forum.
+  - `php8.3-fpm`: active/enabled for the production forum.
   - `fail2ban`: active/enabled for SSH.
   - `cloudflared`: removed/not-found under the current DNS A-record setup.
 - Server API key: keep the real value outside git. Use the deployment secret or environment variable named `WCU_SERVER_API_KEY`; do not paste the raw key into this file.
+- Admissions reCAPTCHA secret: keep the real value outside git. Use the
+  environment variable `WCU_RECAPTCHA_SECRET_KEY`; only the public site key may
+  be placed in `assets/js/site-config.js`.
 - Cloudflare Tunnel token: keep the real token outside git. Install it on the server with `sudo cloudflared service install <TUNNEL_TOKEN>`.
 
 ## Security Rules
@@ -96,6 +125,15 @@ or security posture changes.
 - The following local files must stay untracked: `keys/`, `server/config.php`, `server/config.python.json`, `origincertificate.txt`, and `privatekey.txt`.
 - Local WordPress development credentials such as `~/.wcu-forum-dev.env`
   must stay outside git.
+- Production WordPress/wpForo credentials in `/root/.wcu-forum-prod.env` must
+  stay outside git.
+- Production forum SMTP values (`WCU_FORUM_SMTP_HOST`,
+  `WCU_FORUM_SMTP_USER`, `WCU_FORUM_SMTP_PASSWORD`, and related mail settings)
+  must stay outside git.
+- Production forum reCAPTCHA secret `WCU_FORUM_RECAPTCHA_SECRET_KEY` must stay
+  outside git.
+- Production admissions reCAPTCHA secret `WCU_RECAPTCHA_SECRET_KEY` must stay
+  outside git.
 - Use `server/config.example.php` and `server/config.python.example.json` as templates only.
 - If a task needs a secret, reference the expected variable or config key instead of writing the secret into source control.
 
@@ -105,6 +143,7 @@ or security posture changes.
   - `wcuedu.net` -> `178.238.234.111`
   - `www.wcuedu.net` -> `178.238.234.111`
   - `api.wcuedu.net` -> `178.238.234.111`
+  - `forum.wcuedu.net` -> `178.238.234.111`
 - Cloudflare SSL/TLS mode should be `Full (strict)`.
 - Nginx has a Cloudflare Origin Certificate installed at:
   - certificate: `/etc/nginx/ssl/wcuedu-origin.crt`
@@ -116,11 +155,20 @@ or security posture changes.
   curl.exe -I https://wcuedu.net/
   curl.exe https://wcuedu.net/api/application.php
   curl.exe -I https://wcuedu.net/admin/
+  curl.exe -I https://forum.wcuedu.net/community/
   ```
 - Expected verification:
   - Homepage: `200 OK`.
   - API: `{"ok": true, "service": "wcu-applications-api"}`.
   - Admin: `401 Unauthorized` until valid Basic Auth credentials are supplied.
+  - Forum: `200 OK` and wpForo markup from WordPress, not static homepage HTML.
+- Build Logic Lab from `D:\Projects\Logic gate` with
+  `npm run build -- --base /tools/logic-lab/`, upload `dist/` to
+  `/var/www/wcu-forum/tools/logic-lab/`, then verify:
+  ```powershell
+  curl.exe -I https://forum.wcuedu.net/tools/logic-lab/
+  curl.exe -I https://forum.wcuedu.net/community/
+  ```
 
 ## Security State
 
@@ -139,13 +187,39 @@ Hardening applied on 2026-05-17:
 - `wcu-backend` runs as the dedicated non-root `wcu` service user.
 - Backend CORS only allows `https://wcuedu.net` and `https://www.wcuedu.net`.
 - Nginx sends basic security headers and rate-limits `/admin`.
+- Forum nginx blocks `xmlrpc.php` and rate-limits `wp-login.php`.
+- Forum is public-read; registered subscribers can create topics/replies; guests
+  cannot post. New user registration requires email confirmation. New user
+  posts are moderated and link/attachment access is gated until 3 approved
+  posts.
+- Forum reCAPTCHA is configured through wpForo's built-in `wpforo_recaptcha`
+  option when `WCU_FORUM_RECAPTCHA_SITE_KEY` and
+  `WCU_FORUM_RECAPTCHA_SECRET_KEY` are set in `/root/.wcu-forum-prod.env`.
+- wpForo AI usergroup capabilities are disabled until a real AI service key is
+  intentionally configured outside git.
 - The old `cloudflared` systemd token unit was removed.
+
+Additional admissions hardening applied on 2026-05-18:
+
+- Python admin delete and CSV export actions require stateless CSRF tokens.
+- Python admin password hashes use scrypt formats; legacy SHA-256 hashes should
+  be migrated with `server/scripts/hash-admin-password.py --from-sha256`.
+- Python and PHP admin login attempts are rate-limited.
+- Python API requests reject unsupported content types with `415 Unsupported
+  Media Type`.
+- Admissions submissions support Google reCAPTCHA verification. The backend
+  rejects submissions without a valid token when `WCU_RECAPTCHA_SECRET_KEY` is
+  set or `recaptcha.enabled` is true in the local backend config.
 
 Remaining maintenance:
 
 - Schedule a reboot; `/var/run/reboot-required` still existed after hardening.
 - Keep Cloudflare IP allowlists in `ufw` updated if Cloudflare changes its
   published ranges.
+- Set valid production `WCU_FORUM_SMTP_*` values and verify one real forum
+  registration email before relying on password reset or notification emails.
+- Set valid production `WCU_FORUM_RECAPTCHA_*` values and verify one real forum
+  registration as a logged-out visitor.
 
 ## Coding Guidelines
 
@@ -157,7 +231,18 @@ Remaining maintenance:
 
 ## Workflow
 
-1. record bugs that need to be fixed in todo list (TODO.md), and delete the ones that are fixed and record the fixed bugs in the changelog (changelog.md)
-2. Before making any code changes, check the TODO.md file to see if there are any existing bugs that need to be fixed. If there are, prioritize fixing those bugs before adding new features or making other changes. Before applying the change, think why this approach is better than the existing one, and if it is not, then do not apply the change.
-3. After making code changes, run all the tests to ensure that the changes do not break any existing functionality. If any tests fail, investigate the cause and fix the issue before proceeding.
-4. After applying changes to the code, ensure that you update the documentation in this file to reflect the changes made. This includes updating any relevant sections such as architecture, testing, or known limitations.
+1. Record bugs that need to be fixed in `TODO.md`; when a bug is fixed,
+   remove it from `TODO.md` and record the fix in `changelog.md`.
+2. Before making code changes, check `git status --short --branch` and read
+   `TODO.md`. Prioritize active bugs before new features unless the requested
+   task explicitly says otherwise.
+3. Choose the target integration branch before editing. For forum work, the
+   target integration branch is `forum`; create a fresh branch from `forum`
+   before changing forum code or docs.
+4. Before applying a change, consider why the new approach is better than the
+   existing one. If it is not clearly better, do not apply it.
+5. After making code changes, run the relevant tests. Forum changes must also
+   be tested against the WSL local WordPress/wpForo server at
+   `http://localhost:8081/community/` before merging back to `forum`.
+6. After applying changes, update this file and related docs when architecture,
+   workflow, testing, deployment, or known limitations change.
